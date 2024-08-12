@@ -1,0 +1,22 @@
+{% extends 'course/base.html' %}
+{% load static %}
+
+{% block links %}
+{% endblock %}
+
+{% block content %}
+    <h1>{{ task.name }}</h1>
+
+    <table>
+        <tr>
+            <th>Англійською</th>
+            <th>Українською</th>
+        </tr>
+        {% for data in task.taskdata_set.all %}
+        <tr>
+            <td>{{ data.column1 }}</td>
+            <td>{{ data.column2 }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

@@ -1,0 +1,80 @@
+#courses {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.course-text {
+    font-size: 26px;
+}
+
+.course-icon-block {
+    border: 5px solid black;
+    border-radius: 16px;
+    padding: 10px;
+    max-width: 110px;
+    max-height: 110px;
+}
+
+.course-icon-block.clickable-task {
+    cursor: pointer;
+}
+
+.course-imgs {
+    width: 80px;
+    height: 80px;
+}
+
+.course-block {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.small-course-imgs {
+    width: 35px;
+    height: 35px;
+}
+
+.task-change-icons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    gap: 20px;
+}
+
+.edit-task-btn {
+    background-color: transparent;
+    border: transparent;
+}
+
+.delete-task-btn {
+    background-color: transparent;
+    border: transparent;
+    padding: 0;
+}
+
+.course-block {
+    position: relative;
+}
+
+.task-name-popup {
+    display: none;
+    position: absolute;
+    bottom: 25%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #333;
+    color: #fff;
+    padding: 5px;
+    border-radius: 4px;
+    white-space: nowrap;
+    z-index: 1000;
+}
+
+.course-block:hover .task-name-popup {
+    display: block;
+}
