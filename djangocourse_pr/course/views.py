@@ -3,6 +3,7 @@ from django.http import JsonResponse
 from .models import *
 import pandas
 from django.urls import reverse
+from django.template.loader import render_to_string
 
 # Create your views here.
 def main_view(request):
@@ -30,16 +31,14 @@ def course_view(request):
                             column2=column2_value
                         )
                         
-                task_url = reverse('task_detail', args=[task.id])
+                # task_url = reverse('task_detail', args=[task.id])
+                
+                task_html = render_to_string('course/task_block.html', {'task': task}, request=request)
                 
                 return JsonResponse({
                     'addName': True,
                     'error': '',
-                    'task': {
-                        'id': task.id,
-                        'name': task.name,
-                        'url': task_url,
-                    }
+                    'task_html': task_html,
                 })
             else:
                 return JsonResponse({'error': 'Заповніть поле з назвою завдання'})

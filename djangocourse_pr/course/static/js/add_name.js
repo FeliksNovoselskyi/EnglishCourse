@@ -23,21 +23,7 @@ $(document).ready(function() {
                     // <p>${response.task.name}</p>
                     // <button class="edit-task-btn"><img src="/static/images/edit.png" alt="change-task-img" class="small-course-imgs"></button>
 
-                    $('.course-block.add-task-block').before(
-                        `
-                        <div class="course-block">
-                            <div class="course-icon-block clickable-task" onclick="window.location.href='${response.task.url}'">
-                                <img src="/static/images/finished.png" alt="finished-img" class="course-imgs">
-                            </div>
-
-                            <div class="task-change-icons">
-                                <button class="delete-task-btn"><img src="/static/images/delete.png" alt="change-task-img" class="small-course-imgs"></button>
-                            </div>
-
-                            <div class="task-name-popup">${response.task.name}</div>
-                        </div>
-                        `
-                    )
+                    $('.course-block.add-task-block').before(response.task_html)
                 }
                 if (response.error) {
                     $('#error-message').text(response.error);
