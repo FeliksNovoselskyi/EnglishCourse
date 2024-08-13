@@ -19,10 +19,6 @@ $(document).ready(function() {
                 if (response.addName) {
                     // тут типо все норм и все правильно, ошибок в заполнении поля нет!!
                     $('#error-message').text(response.error);
-
-                    // <p>${response.task.name}</p>
-                    // <button class="edit-task-btn"><img src="/static/images/edit.png" alt="change-task-img" class="small-course-imgs"></button>
-
                     $('.course-block.add-task-block').before(response.task_html)
                 }
                 if (response.error) {

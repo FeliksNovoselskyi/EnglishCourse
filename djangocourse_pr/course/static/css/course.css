@@ -108,7 +108,8 @@
 
 .task-buttons {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    justify-content: space-between;
     gap: 10px;
 }
 
@@ -124,4 +125,30 @@
 
 .task-nav-buttons:hover {
     background-color: #dedede;
+}
+
+.sentence {
+    font-size: 28px;
+}
+
+.words-block {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.word-button {
+    width: 30%;
+    background-color: #23232300;
+    border: 2px solid rgb(28, 28, 28);
+    border-radius: 16px;
+    padding: 20px;
+    transition: all 150ms ease-in-out;
+}
+
+.word-button:hover {
+    background-color: rgb(28, 28, 28);
+    color: #fff;
 }

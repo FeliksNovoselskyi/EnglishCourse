@@ -1,9 +1,10 @@
 from django.shortcuts import render, get_object_or_404
+from django.template.loader import render_to_string
 from django.http import JsonResponse
+from django.urls import reverse
 from .models import *
 import pandas
-from django.urls import reverse
-from django.template.loader import render_to_string
+import random
 
 # Create your views here.
 def main_view(request):
@@ -66,10 +67,14 @@ def task_detail_view(request, task_id):
         task_data_list = list(task.taskdata_set.all().order_by('id'))
         if current_index < len(task_data_list) - 1:
             next_data = task_data_list[current_index + 1]
+            random_sentences = list(TaskData.objects.values_list('column1', flat=True))
+            random_sentences = random.sample(random_sentences, min(len(random_sentences), 10))
+            
             response_data = {
                 'column1': next_data.column1,
                 'column2': next_data.column2,
                 'next_index': current_index + 1,
+                'random_sentences': random_sentences,
             }
         else:
             response_data = {'error': True}

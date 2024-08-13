@@ -11,17 +11,31 @@
 
 {% block content %}
     <h1>{{task.name}}</h1>
-        
-    <div id="task-data" data-current-index="0" data-task-id="{{task.id}}">
-        <p id="column1">{{first_data.column1}}</p>
-        <p id="column2">{{first_data.column2}}</p>
-    </div>
 
     <div class="task-buttons">
+        <a href="{% url 'course' %}"><button class="task-nav-buttons">До уроку</button></a>
         <form id="nexttaskform">
             {% csrf_token %}
             <input type="submit" class="task-nav-buttons" value="Наступне">
         </form>
-        <a href="{% url 'course' %}"><button class="task-nav-buttons">До уроку</button></a>
+    </div>
+        
+    <div id="task-data" data-current-index="0" data-task-id="{{task.id}}">
+        <p class="sentence" id="column1" style="display: none; visibility: hidden;">{{first_data.column1}}</p>
+        <p class="sentence" id="column2">{{first_data.column2}}</p>
+    </div>
+
+    <div class="words-block">
+        <button class="word-button">1</button>
+        <button class="word-button">1</button>
+        <button class="word-button">1</button>
+
+        <button class="word-button">1</button>
+        <button class="word-button">1</button>
+        <button class="word-button">1</button>
+        
+        <button class="word-button">1</button>
+        <button class="word-button">1</button>
+        <button class="word-button">1</button>
     </div>
 {% endblock %}
