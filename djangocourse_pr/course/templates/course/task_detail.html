@@ -2,21 +2,26 @@
 {% load static %}
 
 {% block links %}
+    <link rel="stylesheet" href="{% static 'css/course.css' %}">
+    <script src="{% static 'js/words_task.js' %}" defer></script>
+    <script>
+        const allTasksUrl = "{% url 'course' %}";
+    </script>
 {% endblock %}
 
 {% block content %}
     <h1>{{ task.name }}</h1>
+        
+    <div id="task-data" data-current-index="0" data-task-id="{{task.id}}">
+        <p id="column1">{{first_data.column1}}</p>
+        <p id="column2">{{first_data.column2}}</p>
+    </div>
 
-    <table>
-        <tr>
-            <th>Англійською</th>
-            <th>Українською</th>
-        </tr>
-        {% for data in task.taskdata_set.all %}
-        <tr>
-            <td>{{ data.column1 }}</td>
-            <td>{{ data.column2 }}</td>
-        </tr>
-        {% endfor %}
-    </table>
+    <div class="task-buttons">
+        <form id="nexttaskform">
+            {% csrf_token %}
+            <input type="submit" id="next-button" value="Наступне">
+        </form>
+        <a href="{% url 'course' %}"><button id="back-button">До уроку</button></a>
+    </div>
 {% endblock %}

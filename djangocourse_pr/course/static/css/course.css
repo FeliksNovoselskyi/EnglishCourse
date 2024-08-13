@@ -78,3 +78,18 @@
 .course-block:hover .task-name-popup {
     display: block;
 }
+
+.task-links-block {
+    display: flex;
+    flex-direction: column;
+}
+
+.course-block.add-task-block {
+    cursor: pointer;
+}
+
+.task-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}

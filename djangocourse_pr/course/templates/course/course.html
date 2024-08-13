@@ -26,11 +26,11 @@
             </div>
         {% endfor %}
 
-        <div class="course-block add-task-block">
+        <div class="course-block add-task-block" data-bs-toggle="modal" data-bs-target="#exampleModal">
             <div class="course-icon-block">
                 <img src="{% static 'images/add.png' %}" alt="add-img" class="course-imgs">
             </div>
-            <button type="button" class="courses-buttons" data-bs-toggle="modal" data-bs-target="#exampleModal"><p class="course-text">Додати</p></button>
+            <button type="button" class="courses-buttons"><p class="course-text">Додати</p></button>
         </div>
     </div>
 
