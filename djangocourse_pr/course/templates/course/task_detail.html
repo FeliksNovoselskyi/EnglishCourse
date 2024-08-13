@@ -10,7 +10,7 @@
 {% endblock %}
 
 {% block content %}
-    <h1>{{ task.name }}</h1>
+    <h1>{{task.name}}</h1>
         
     <div id="task-data" data-current-index="0" data-task-id="{{task.id}}">
         <p id="column1">{{first_data.column1}}</p>
@@ -20,8 +20,8 @@
     <div class="task-buttons">
         <form id="nexttaskform">
             {% csrf_token %}
-            <input type="submit" id="next-button" value="Наступне">
+            <input type="submit" class="task-nav-buttons" value="Наступне">
         </form>
-        <a href="{% url 'course' %}"><button id="back-button">До уроку</button></a>
+        <a href="{% url 'course' %}"><button class="task-nav-buttons">До уроку</button></a>
     </div>
 {% endblock %}

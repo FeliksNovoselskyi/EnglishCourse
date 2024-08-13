@@ -17,7 +17,7 @@
                 <div class="task-change-icons">
                     <form method="post" id="delete-task-form" action="">
                         {% csrf_token %}
-                        <input type="hidden" name="task_id" value="{{ task.id }}">
+                        <input type="hidden" name="task_id" value="{{task.id}}">
                         <button type="submit" name="delete_task" class="delete-task-btn"><img src="{% static 'images/delete.png' %}" alt="change-task-img" class="small-course-imgs"></button>
                     </form>
                 </div>
@@ -27,7 +27,7 @@
         {% endfor %}
 
         <div class="course-block add-task-block" data-bs-toggle="modal" data-bs-target="#exampleModal">
-            <div class="course-icon-block">
+            <div class="course-icon-block add-task-icon-block">
                 <img src="{% static 'images/add.png' %}" alt="add-img" class="course-imgs">
             </div>
             <button type="button" class="courses-buttons"><p class="course-text">Додати</p></button>

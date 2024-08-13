@@ -16,6 +16,10 @@
     max-height: 110px;
 }
 
+.course-icon-block.add-task-icon-block {
+    margin-top: -5px;
+}
+
 .course-icon-block.clickable-task {
     cursor: pointer;
 }
@@ -33,9 +37,20 @@
     gap: 10px;
 }
 
+.task-change-icons {
+    height: 35px;
+}
+
+
 .small-course-imgs {
     width: 35px;
     height: 35px;
+    transition: all 150ms ease-in-out;
+}
+
+.small-course-imgs:hover {
+    width: 30px;
+    height: 30px;
 }
 
 .task-change-icons {
@@ -59,10 +74,11 @@
 
 .course-block {
     position: relative;
+    transition: all 150ms ease-in-out;
 }
 
 .task-name-popup {
-    display: none;
+    display: block;
     position: absolute;
     bottom: 25%;
     left: 50%;
@@ -73,10 +89,12 @@
     border-radius: 4px;
     white-space: nowrap;
     z-index: 1000;
+    opacity: 0;
+    transition: all 150ms ease-in-out;
 }
 
 .course-block:hover .task-name-popup {
-    display: block;
+    opacity: 1;
 }
 
 .task-links-block {
@@ -92,4 +110,18 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
+}
+
+.task-nav-buttons {
+    border: transparent;
+    border-radius: 6px;
+    font-size: 18px;
+    box-shadow: 0 0 2px black;
+    padding: 5px 10px;
+    width: 100px;
+    transition: all 150ms ease-in-out;
+}
+
+.task-nav-buttons:hover {
+    background-color: #dedede;
 }

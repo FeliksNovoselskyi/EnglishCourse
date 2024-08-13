@@ -31,7 +31,6 @@ def course_view(request):
                         )
                         
                 task_url = reverse('task_detail', args=[task.id])
-                print(task_url)
                 
                 return JsonResponse({
                     'addName': True,
@@ -47,7 +46,6 @@ def course_view(request):
         
         if 'delete_task' in request.POST:
             task_id = request.POST.get('task_id')
-            print(task_id)
             try:
                 task = Task.objects.get(id=task_id)
                 task.delete()
