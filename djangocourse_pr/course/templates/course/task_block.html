@@ -1,7 +1,7 @@
 {% load static %}
 
 <div class="course-block">
-    <div class="course-icon-block clickable-task" data-task-url="{% url 'task_detail' task.id %}">
+    <div class="course-icon-block clickable-task" onclick="window.location.href='{{task_url}}'">
         <img src="{% static 'images/finished.png' %}" alt="finished-img" class="course-imgs">
     </div>
 

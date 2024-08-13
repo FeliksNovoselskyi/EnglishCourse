@@ -31,9 +31,12 @@ def course_view(request):
                             column2=column2_value
                         )
                         
-                # task_url = reverse('task_detail', args=[task.id])
+                task_url = reverse('task_detail', args=[task.id])
                 
-                task_html = render_to_string('course/task_block.html', {'task': task}, request=request)
+                task_html = render_to_string('course/task_block.html', {
+                    'task': task,
+                    'task_url': task_url,
+                }, request=request)
                 
                 return JsonResponse({
                     'addName': True,
