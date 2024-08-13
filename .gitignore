@@ -1,0 +1,15 @@
+djangocourse_pr/course/__pycache__/__init__.cpython-312.pyc
+djangocourse_pr/course/__pycache__/admin.cpython-312.pyc
+djangocourse_pr/course/__pycache__/apps.cpython-312.pyc
+djangocourse_pr/course/__pycache__/models.cpython-312.pyc
+djangocourse_pr/course/__pycache__/views.cpython-312.pyc
+djangocourse_pr/course/migrations/__pycache__/__init__.cpython-312.pyc
+djangocourse_pr/course/migrations/__pycache__/0001_initial.cpython-312.pyc
+djangocourse_pr/course/migrations/__pycache__/0002_delete_task.cpython-312.pyc
+djangocourse_pr/course/migrations/__pycache__/0003_initial.cpython-312.pyc
+djangocourse_pr/course/migrations/__pycache__/0004_task_excel_file_taskdata.cpython-312.pyc
+djangocourse_pr/djangocourse_pr/__pycache__/__init__.cpython-312.pyc
+djangocourse_pr/djangocourse_pr/__pycache__/settings.cpython-312.pyc
+djangocourse_pr/djangocourse_pr/__pycache__/urls.cpython-312.pyc
+djangocourse_pr/djangocourse_pr/__pycache__/wsgi.cpython-312.pyc
+*.pyc
