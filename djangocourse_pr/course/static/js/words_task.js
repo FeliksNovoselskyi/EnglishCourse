@@ -1,18 +1,13 @@
 $(document).ready(function() {
     const taskData = $('#task-data')
     let currentIndex = parseInt(taskData.data('current-index'), 10)
-
-    // const initialSentence = $('#column1').text().split(" ");
-    // const buttons = $('.word-button');
-
-    // buttons.each(function(index) {
-    //     if (index < initialSentence.length) {
-    //         $(this).text(initialSentence[index]);
-    //     } else {
-    //         $(this).text(randomWords[Math.floor(Math.random() * randomWords.length)]);
-    //     }
-    // });
     
+    const initialSentence = $('#column1').text().split(" ")
+    const buttons = $('.word-button')
+    let randomWordsFirstSentence = ['I', 'You', 'We',
+                                    'They', 'Grass', 'Night',
+                                    'Sofi', 'She', 'It', 'He']
+
     function shuffleArray(array) {
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -20,6 +15,24 @@ $(document).ready(function() {
         }
         return array
     }
+
+    let allWordsFirstSentence = initialSentence.slice(0, 9)
+
+    if (allWordsFirstSentence.length < 9) {
+        const neededWordsCountFS = 9 - allWordsFirstSentence.length
+        const additionalWordsFS = randomWordsFirstSentence.slice(0, neededWordsCountFS)
+        allWordsFirstSentence = allWordsFirstSentence.concat(additionalWordsFS)
+    }
+
+    allWordsFirstSentence = shuffleArray(allWordsFirstSentence)
+
+    buttons.each(function(index) {
+        if (index < allWordsFirstSentence.length) {
+            $(this).text(allWordsFirstSentence[index])
+        } else {
+            $(this).text(allWordsFirstSentence[Math.floor(Math.random() * allWordsFirstSentence.length)])
+        }
+    })
 
     $('#nexttaskform').submit(function(event) {
         event.preventDefault()
