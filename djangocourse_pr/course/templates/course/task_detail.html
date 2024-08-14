@@ -23,6 +23,9 @@
     <div id="task-data" data-current-index="0" data-task-id="{{task.id}}">
         <p class="sentence" id="column1" style="display: none; visibility: hidden;">{{first_data.column1}}</p>
         <p class="sentence" id="column2">{{first_data.column2}}</p>
+        <div class="final-sentence-place">
+            <p class="final-sentence"></p>
+        </div>
     </div>
 
     <div class="words-block">
@@ -37,5 +40,11 @@
         <button class="word-button">1</button>
         <button class="word-button">1</button>
         <button class="word-button">1</button>
+    </div>
+
+    <div class="progress-bar">
+        {% for i in sentences_len %}
+            <div class="progress-bar-cell">{{i}}</div>
+        {% endfor %}
     </div>
 {% endblock %}

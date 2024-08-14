@@ -59,7 +59,9 @@ def course_view(request):
     return render(request, 'course/course.html', {'all_tasks': Task.objects.all()})
 
 def task_detail_view(request, task_id):
+    context = {}
     task = get_object_or_404(Task, id=task_id)
+    task_data_list = list(task.taskdata_set.all().order_by('id'))
     
     if request.method == 'POST':
         current_index = int(request.POST.get('current_index', 0))
@@ -82,9 +84,8 @@ def task_detail_view(request, task_id):
         return JsonResponse(response_data)
 
     first_data = task.taskdata_set.first()
-    context = {
-        'task': task,
-        'first_data': first_data,
-    }
+    context['task'] = task
+    context['first_data'] = first_data
+    context['sentences_len'] = range(1, len(task_data_list) + 1)
 
     return render(request, 'course/task_detail.html', context)
