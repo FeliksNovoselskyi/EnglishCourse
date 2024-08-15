@@ -6,10 +6,10 @@ $(document).ready(function() {
     const buttons = $('.word-button')
     const finalSentence = $('.final-sentence')
     const progressBarCells = $('.progress-bar-cell')
+    const randomWordsFirstSentence = $('#randomwords_first')
 
-    let randomWordsFirstSentence = ['I', 'You', 'We',
-                                    'They', 'Grass', 'Night',
-                                    'Sofi', 'She', 'It', 'He']
+    let randomWordsFirstSentenceText = randomWordsFirstSentence.text()
+    randomWordsFirstSentenceText = randomWordsFirstSentenceText.split(" ")
 
     function shuffleArray(array) {
         for (let i = array.length - 1; i > 0; i--) {
@@ -23,7 +23,8 @@ $(document).ready(function() {
 
     if (allWordsFirstSentence.length < 9) {
         const neededWordsCountFS = 9 - allWordsFirstSentence.length
-        const additionalWordsFS = randomWordsFirstSentence.slice(0, neededWordsCountFS)
+        randomWordsFirstSentenceText.splice(0, 1)
+        const additionalWordsFS = randomWordsFirstSentenceText.slice(0, neededWordsCountFS)
         allWordsFirstSentence = allWordsFirstSentence.concat(additionalWordsFS)
     }
 
@@ -46,26 +47,26 @@ $(document).ready(function() {
     $('.word-button').click(function() {
         const buttonText = $(this).text()
         const currentSentence = finalSentence.text()
-
+        // console.log(currentSentence)
         if (currentSentence) {
             finalSentence.text(`${currentSentence} ${buttonText}`)
         } else {
             finalSentence.text(buttonText)
         }
-    });
+    })
 
-    function checkSentence() {
-        const userSentence = finalSentence.text()
-        const correctSentence = $('#column1').text()
-        return userSentence === correctSentence
-    }
-    
     $('.undo-btn').click(function() {
         const currentSentence = finalSentence.text()
         const currentWordsOfSentence = currentSentence.split(" ")
         currentWordsOfSentence.pop()
         finalSentence.text(`${currentWordsOfSentence.join(' ')}`)
     })
+
+    function checkSentence() {
+        const userSentence = finalSentence.text()
+        const correctSentence = $('#column1').text()
+        return userSentence === correctSentence
+    }
 
     $('#nexttaskform').submit(function(event) {
         event.preventDefault()
@@ -91,19 +92,13 @@ $(document).ready(function() {
                         
                         let words = response.column1.split(" ")
                         let buttons = $('.word-button')
-                        let randomSentences = response.random_sentences
-
-                        const randomIndex = Math.floor(Math.random() * randomSentences.length)
-                        const randomIndex2 = Math.floor(Math.random() * randomSentences.length)
-                        const randomWordsFirst = randomSentences[randomIndex].split(" ")
-                        const randomWordsSecond = randomSentences[randomIndex2].split(" ")
-                        const combinedRandomWords = randomWordsFirst.concat(randomWordsSecond)
+                        let randomWords = response.random_words
 
                         let allSentenceWords = words.slice(0, 9)
 
                         if (allSentenceWords.length < 9) {
                             const neededWordsCount = 9 - allSentenceWords.length
-                            const additionalWords = combinedRandomWords.slice(0, neededWordsCount)
+                            const additionalWords = randomWords.slice(0, neededWordsCount)
                             allSentenceWords = allSentenceWords.concat(additionalWords)
                         }
 

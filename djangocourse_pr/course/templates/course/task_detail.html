@@ -5,7 +5,7 @@
     <link rel="stylesheet" href="{% static 'css/course.css' %}">
     <script src="{% static 'js/words_task.js' %}" defer></script>
     <script>
-        const allTasksUrl = "{% url 'course' %}";
+        const allTasksUrl = "{% url 'course' %}"
     </script>
 {% endblock %}
 
@@ -21,6 +21,7 @@
     </div>
         
     <div id="task-data" data-current-index="0" data-task-id="{{task.id}}">
+        <p id="randomwords_first" style="display: none; visibility: hidden;">{% for word in randomwords_first %} {{word}}{% endfor %}</p>
         <p class="sentence" id="column1" style="display: none; visibility: hidden;">{{first_data.column1}}</p>
         <p class="sentence" id="column2">{{first_data.column2}}</p>
         <div class="final-sentence-undo">

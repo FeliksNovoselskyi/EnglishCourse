@@ -15,6 +15,7 @@ def course_view(request):
         if 'add_task' in request.POST:
             task_name = request.POST.get('taskname')
             task_file = request.FILES.get('taskfile')
+            additional_words_file = request.FILES.get('additional_words_file')
             
             if task_name:
                 task = Task.objects.create(name=task_name)
@@ -29,8 +30,21 @@ def course_view(request):
                         TaskData.objects.create(
                             task=task,
                             column1=column1_value,
-                            column2=column2_value
+                            column2=column2_value,
                         )
+                if additional_words_file:
+                    # print(11111)
+                    df = pandas.read_excel(additional_words_file)
+
+                    for row in df.itertuples(index=False):
+                        word_value = row[0]
+                        # print(word_value)
+ 
+                        AdditionalWords.objects.create(
+                            task=task,
+                            word=word_value,
+                        )
+                
                         
                 task_url = reverse('task_detail', args=[task.id])
                 
@@ -61,31 +75,30 @@ def course_view(request):
 def task_detail_view(request, task_id):
     context = {}
     task = get_object_or_404(Task, id=task_id)
-    task_data_list = list(task.taskdata_set.all().order_by('id'))
+    task_data_list = list(task.task_data.all().order_by('id'))
+    random_words = list(AdditionalWords.objects.values_list('word', flat=True))
     
     if request.method == 'POST':
         current_index = int(request.POST.get('current_index', 0))
         
-        task_data_list = list(task.taskdata_set.all().order_by('id'))
         if current_index < len(task_data_list) - 1:
             next_data = task_data_list[current_index + 1]
-            random_sentences = list(TaskData.objects.values_list('column1', flat=True))
-            random_sentences = random.sample(random_sentences, min(len(random_sentences), 10))
             
             response_data = {
                 'column1': next_data.column1,
                 'column2': next_data.column2,
                 'next_index': current_index + 1,
-                'random_sentences': random_sentences,
+                'random_words': random_words,
             }
         else:
             response_data = {'error': True}
 
         return JsonResponse(response_data)
 
-    first_data = task.taskdata_set.first()
+    first_data = task.task_data.first()
     context['task'] = task
     context['first_data'] = first_data
     context['sentences_len'] = range(1, len(task_data_list) + 1)
-
+    context['randomwords_first'] = random_words
+    
     return render(request, 'course/task_detail.html', context)

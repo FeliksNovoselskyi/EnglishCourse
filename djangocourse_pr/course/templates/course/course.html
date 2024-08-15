@@ -43,7 +43,10 @@
                         {% csrf_token %}
                         <p class="course-text">Додайте назву завданню:</p>
                         <input type="text" maxlength="10" name="taskname">
+                        <p>Речення:</p>
                         <input type="file" name="taskfile">
+                        <p>Додаткові слова:</p>
+                        <input type="file" name="additional_words_file">
                         
                         <p id="error-message"></p>
 

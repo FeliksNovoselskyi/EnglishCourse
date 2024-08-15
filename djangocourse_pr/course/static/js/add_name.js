@@ -7,6 +7,7 @@ $(document).ready(function() {
         formData.append('csrfmiddlewaretoken', $('input[name=csrfmiddlewaretoken]').val())
         formData.append('taskname', $('input[name=taskname]').val())
         formData.append('taskfile', $('input[name=taskfile]')[0].files[0])
+        formData.append('additional_words_file', $('input[name=additional_words_file]')[0].files[0])
         formData.append('add_task', true)
 
         $.ajax({
