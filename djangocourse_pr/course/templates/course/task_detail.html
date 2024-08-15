@@ -13,7 +13,9 @@
     <h1>{{task.name}}</h1>
 
     <div class="task-buttons">
+        <!-- кнопка, ну или ссылка для возвращения на страницу курса -->
         <a href="{% url 'course' %}"><button class="task-nav-buttons">До уроку</button></a>
+        <!-- форма для кнопки следующего предложения -->
         <form id="nexttaskform">
             {% csrf_token %}
             <input type="submit" class="task-nav-buttons" value="Наступне">
@@ -21,13 +23,16 @@
     </div>
         
     <div id="task-data" data-current-index="0" data-task-id="{{task.id}}">
+        <!-- рандомные слова для первого предложения -->
         <p id="randomwords_first" style="display: none; visibility: hidden;">{% for word in randomwords_first %} {{word}}{% endfor %}</p>
+        <!-- английское предложения, для первого предложения -->
         <p class="sentence" id="column1" style="display: none; visibility: hidden;">{{first_data.column1}}</p>
         <p class="sentence" id="column2">{{first_data.column2}}</p>
         <div class="final-sentence-undo">
             <div class="final-sentence-place">
                 <p class="final-sentence"></p>
             </div>
+            <!-- кнопка удаления -->
             <button class="undo-btn"><img src="{% static 'images/undo.png' %}" alt="undo-img" style="width: 30px; height: 30px;"></button>
         </div>
     </div>
