@@ -59,6 +59,13 @@ $(document).ready(function() {
         const correctSentence = $('#column1').text()
         return userSentence === correctSentence
     }
+    
+    $('.undo-btn').click(function() {
+        const currentSentence = finalSentence.text()
+        const currentWordsOfSentence = currentSentence.split(" ")
+        currentWordsOfSentence.pop()
+        finalSentence.text(`${currentWordsOfSentence.join(' ')}`)
+    })
 
     $('#nexttaskform').submit(function(event) {
         event.preventDefault()
