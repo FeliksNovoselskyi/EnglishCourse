@@ -7,6 +7,8 @@ $(document).ready(function() {
     const finalSentence = $('.final-sentence') // получаем предложение, собираемое пользователем
     const progressBarCells = $('.progress-bar-cell') // получаем прогресс бар
     const randomWordsFirstSentence = $('#randomwords_first') // получаем рандомные слова для первого предложения
+    const changeFinalSentence = document.querySelector('.final-sentence')
+    const finalSentencePlace = document.querySelector('.final-sentence-place')
 
     let randomWordsFirstSentenceText = randomWordsFirstSentence.text()
     randomWordsFirstSentenceText = randomWordsFirstSentenceText.split(" ")
@@ -82,6 +84,24 @@ $(document).ready(function() {
         return userSentence === correctSentence
     }
 
+    function checkSentenceByInterval() {
+        const userSentence = finalSentence.text() // получаем то, что собрал пользователь
+        const correctSentence = $('#column1').text() // получаем то, что нужно собрать
+        // проверяем
+        if (userSentence === correctSentence) {
+            changeFinalSentence.style.color = 'orange'
+            finalSentencePlace.style.borderBottom = 'dashed 2px orange'
+            return userSentence === correctSentence
+        } else {
+            changeFinalSentence.style.color = 'black'
+            finalSentencePlace.style.borderBottom = 'dashed 2px rgb(28, 28, 28)'
+            return userSentence === correctSentence
+        }
+    }
+
+    // вызываем функцию проверки правильности предложения для смены его цвета
+    // каждые 500 миллисекунд
+    setInterval(checkSentenceByInterval, 500)
     $('#nexttaskform').submit(function(event) {
         // не даем форме сразу отправиться
         event.preventDefault()
