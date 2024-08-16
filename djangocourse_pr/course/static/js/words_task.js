@@ -9,6 +9,11 @@ $(document).ready(function() {
     const randomWordsFirstSentence = $('#randomwords_first') // получаем рандомные слова для первого предложения
     const changeFinalSentence = document.querySelector('.final-sentence')
     const finalSentencePlace = document.querySelector('.final-sentence-place')
+    
+    // флаги
+    let formSubmittedFlag = false
+    let updateSentenceFlag = true
+    let undoSentenceFlag = true
 
     let randomWordsFirstSentenceText = randomWordsFirstSentence.text()
     randomWordsFirstSentenceText = randomWordsFirstSentenceText.split(" ")
@@ -60,9 +65,9 @@ $(document).ready(function() {
         const buttonText = $(this).text()
         const currentSentence = finalSentence.text()
         // console.log(currentSentence)
-        if (currentSentence) {
+        if (currentSentence && updateSentenceFlag) {
             finalSentence.text(`${currentSentence} ${buttonText}`) // задаем новое слово к старым, если они есть
-        } else {
+        } else if (!currentSentence && updateSentenceFlag) {
             finalSentence.text(buttonText) // просто задаем новое слово, ибо до него ничего нет
         }
     })
@@ -70,94 +75,118 @@ $(document).ready(function() {
     // обрабатываем событие клика на кнопку удаления последнего слова
     $('.undo-btn').click(function() {
         // получаем то что уже введено, и преобразуем в массив
-        const currentSentence = finalSentence.text()
-        const currentWordsOfSentence = currentSentence.split(" ")
-        currentWordsOfSentence.pop() // удаляем последний элемент (последнее слово)
-        finalSentence.text(`${currentWordsOfSentence.join(' ')}`) // преобразуем снова в текст, и задаем
+        if (undoSentenceFlag) {
+            const currentSentence = finalSentence.text()
+            const currentWordsOfSentence = currentSentence.split(" ")
+            currentWordsOfSentence.pop() // удаляем последний элемент (последнее слово)
+            finalSentence.text(`${currentWordsOfSentence.join(' ')}`) // преобразуем снова в текст, и задаем
+        }
     })
 
-    // функция проверки правильности предложения
-    function checkSentence() {
-        const userSentence = finalSentence.text() // получаем то, что собрал пользователь
-        const correctSentence = $('#column1').text() // получаем то, что нужно собрать
-        // проверяем
-        return userSentence === correctSentence
+    function incorrectSentence() {
+        changeFinalSentence.style.color = 'red'
+        finalSentencePlace.style.borderBottom = 'dashed 2px red'
+        progressBarCells.eq(currentIndex).addClass('incorrect') // выделяем текущую ячейку прогресс-бара красным цветом
+        formSubmittedFlag = true
+        updateSentenceFlag = false
+        undoSentenceFlag = false
+        setTimeout(function() {
+            $('#nexttaskform').submit(); // отправка формы через 2 секунды
+        }, 2000);
     }
 
+    // функция проверки правильности предложения
     function checkSentenceByInterval() {
-        const userSentence = finalSentence.text() // получаем то, что собрал пользователь
-        const correctSentence = $('#column1').text() // получаем то, что нужно собрать
-        // проверяем
-        if (userSentence === correctSentence) {
-            changeFinalSentence.style.color = 'orange'
-            finalSentencePlace.style.borderBottom = 'dashed 2px orange'
-            return userSentence === correctSentence
+        if (formSubmittedFlag) return
+
+        const userSentence = finalSentence.text() // получаем предложение, собранное пользователем
+        const correctSentence = $('#column1').text() // правильное предложение
+        const userWords = userSentence.split(" ") // разбиваем предложение пользователя на слова
+        const correctWords = correctSentence.split(" ") // разбиваем правильное предложение на слова
+
+        if (userWords.length > correctWords.length) {
+            incorrectSentence()
+        } else if (userWords.length === correctWords.length)  {
+            if (userSentence === correctSentence) {
+                // Если предложение собрано правильно
+                changeFinalSentence.style.color = 'orange'
+                finalSentencePlace.style.borderBottom = 'dashed 2px orange'
+                formSubmittedFlag = true
+                updateSentenceFlag = false
+                undoSentenceFlag = false
+                setTimeout(function() {
+                    $('#nexttaskform').submit(); // отправка формы через 2 секунды
+                }, 2000)
+            } else {
+                incorrectSentence()
+            }
         } else {
+            // Если предложение ещё не собрано или неправильно
             changeFinalSentence.style.color = 'black'
             finalSentencePlace.style.borderBottom = 'dashed 2px rgb(28, 28, 28)'
-            return userSentence === correctSentence
+            progressBarCells.eq(currentIndex).removeClass('incorrect')
         }
     }
 
-    // вызываем функцию проверки правильности предложения для смены его цвета
-    // каждые 500 миллисекунд
-    setInterval(checkSentenceByInterval, 500)
+    setInterval(checkSentenceByInterval, 100)
+    
     $('#nexttaskform').submit(function(event) {
         // не даем форме сразу отправиться
         event.preventDefault()
 
         // проверяем, верно ли собрано предложение
-        if (checkSentence()) {
-            $.ajax({
-                url: window.location.href,
-                type: 'POST',
-                data: {
-                    'current_index': currentIndex,
-                    'csrfmiddlewaretoken': $('input[name="csrfmiddlewaretoken"]').val(),
-                },
-                success: function(response) {
-                    if (response.error) {
-                        window.location.href = allTasksUrl // в случае ошибки перенаправляем на страницу со всеми заданиями
-                    } else {
-                        $('#column1').text(response.column1) // получаем английское предложение с бекенда
-                        $('#column2').text(response.column2) // получаем украинское предложение с бекенда
-                        currentIndex = response.next_index // получаем с бекенда индекс следующего предложения
-                        taskData.data('current-index', currentIndex) // меняем предложение на странице после проверки на его правильность
+        $.ajax({
+            url: window.location.href,
+            type: 'POST',
+            data: {
+                'current_index': currentIndex,
+                'csrfmiddlewaretoken': $('input[name="csrfmiddlewaretoken"]').val(),
+            },
+            success: function(response) {
+                if (response.error) {
+                    window.location.href = allTasksUrl // в случае ошибки перенаправляем на страницу со всеми заданиями
+                } else {
+                    $('#column1').text(response.column1) // получаем английское предложение с бекенда
+                    $('#column2').text(response.column2) // получаем украинское предложение с бекенда
+                    currentIndex = response.next_index // получаем с бекенда индекс следующего предложения
+                    taskData.data('current-index', currentIndex) // меняем предложение на странице после проверки на его правильность
 
-                        // обновление прогресса после верного прохождения предложения
-                        updateProgressBar()
-                        
-                        let words = response.column1.split(" ") // получаем предложение, которое нужно собрать
-                        let buttons = $('.word-button') // получаем все кнопки, для сбора предложения
-                        let randomWords = response.random_words // получаем рандомные слова для заполнения пустых кнопок ими
+                    // обновление прогресса после верного прохождения предложения
+                    updateProgressBar()
+                    
+                    let words = response.column1.split(" ") // получаем предложение, которое нужно собрать
+                    let buttons = $('.word-button') // получаем все кнопки, для сбора предложения
+                    let randomWords = response.random_words // получаем рандомные слова для заполнения пустых кнопок ими
 
-                        // получение требуемых слов из английского предложения
-                        let allSentenceWords = words.slice(0, 9)
+                    // получение требуемых слов из английского предложения
+                    let allSentenceWords = words.slice(0, 9)
 
-                        // проверка на то, сколько требуемых для выполнения предложения слов из 9
-                        // исходя из этого, вычисление сколько кнопок остаются пустыми, и в массиве заполняются пустые места для них
-                        if (allSentenceWords.length < 9) {
-                            const neededWordsCount = 9 - allSentenceWords.length
-                            const additionalWords = randomWords.slice(0, neededWordsCount)
-                            allSentenceWords = allSentenceWords.concat(additionalWords)
-                        }
-
-                        // перемешивание массива со словами для кнопок для сбора предложения
-                        allSentenceWords = shuffleArray(allSentenceWords)
-
-                        // заполнение текста кнопок для сбора слов
-                        buttons.each(function(index) {
-                            if (index < allSentenceWords.length) {
-                                $(this).text(allSentenceWords[index])
-                            }
-                        });
-                        
-                        // очистка предыдущего предложения от его слов
-                        // для того чтобы новое предложение было изначально пустым
-                        finalSentence.text('');
+                    // проверка на то, сколько требуемых для выполнения предложения слов из 9
+                    // исходя из этого, вычисление сколько кнопок остаются пустыми, и в массиве заполняются пустые места для них
+                    if (allSentenceWords.length < 9) {
+                        const neededWordsCount = 9 - allSentenceWords.length
+                        const additionalWords = randomWords.slice(0, neededWordsCount)
+                        allSentenceWords = allSentenceWords.concat(additionalWords)
                     }
-                },
-            });
-        }
+
+                    // перемешивание массива со словами для кнопок для сбора предложения
+                    allSentenceWords = shuffleArray(allSentenceWords)
+
+                    // заполнение текста кнопок для сбора слов
+                    buttons.each(function(index) {
+                        if (index < allSentenceWords.length) {
+                            $(this).text(allSentenceWords[index])
+                        }
+                    });
+                    
+                    // очистка предыдущего предложения от его слов
+                    // для того чтобы новое предложение было изначально пустым
+                    finalSentence.text('')
+                    formSubmittedFlag = false
+                    updateSentenceFlag = true
+                    undoSentenceFlag = true
+                }
+            },
+        });
     });
 });
