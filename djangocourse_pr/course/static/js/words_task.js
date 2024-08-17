@@ -41,6 +41,9 @@ $(document).ready(function() {
 
     // перемешиваем массив слов для первого предложения
     allWordsFirstSentence = shuffleArray(allWordsFirstSentence)
+    allWordsFirstSentence = allWordsFirstSentence.toString()
+    allWordsFirstSentence = allWordsFirstSentence.toLowerCase()
+    allWordsFirstSentence = allWordsFirstSentence.split(',')
 
     // заполняем все кнопки со словами для первого предложения
     buttons.each(function(index) {
@@ -91,7 +94,7 @@ $(document).ready(function() {
         updateSentenceFlag = false
         undoSentenceFlag = false
         setTimeout(function() {
-            $('#nexttaskform').submit(); // отправка формы через 2 секунды
+            $('#nexttaskform').submit() // отправка формы через 2 секунды
         }, 2000);
     }
 
@@ -100,9 +103,13 @@ $(document).ready(function() {
         if (formSubmittedFlag) return
 
         const userSentence = finalSentence.text() // получаем предложение, собранное пользователем
-        const correctSentence = $('#column1').text() // правильное предложение
+        let correctSentence = $('#column1').text() // правильное предложение
+        correctSentence = correctSentence.toLowerCase()
         const userWords = userSentence.split(" ") // разбиваем предложение пользователя на слова
         const correctWords = correctSentence.split(" ") // разбиваем правильное предложение на слова
+        // console.log(userWords)
+        // console.log(correctWords)
+
 
         if (userWords.length > correctWords.length) {
             incorrectSentence()
@@ -115,7 +122,7 @@ $(document).ready(function() {
                 updateSentenceFlag = false
                 undoSentenceFlag = false
                 setTimeout(function() {
-                    $('#nexttaskform').submit(); // отправка формы через 2 секунды
+                    $('#nexttaskform').submit() // отправка формы через 2 секунды
                 }, 2000)
             } else {
                 incorrectSentence()
@@ -171,6 +178,9 @@ $(document).ready(function() {
 
                     // перемешивание массива со словами для кнопок для сбора предложения
                     allSentenceWords = shuffleArray(allSentenceWords)
+                    allSentenceWords = allSentenceWords.toString()
+                    allSentenceWords = allSentenceWords.toLowerCase()
+                    allSentenceWords = allSentenceWords.split(',')
 
                     // заполнение текста кнопок для сбора слов
                     buttons.each(function(index) {
