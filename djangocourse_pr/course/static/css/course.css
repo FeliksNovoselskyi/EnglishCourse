@@ -133,6 +133,7 @@
 
 .final-sentence {
     font-size: 28px;
+    text-transform: uppercase;
 }
 
 .words-block {
@@ -149,6 +150,7 @@
     border: 2px solid rgb(28, 28, 28);
     border-radius: 16px;
     padding: 20px;
+    text-transform: uppercase;
     transition: all 150ms ease-in-out;
 }
 
