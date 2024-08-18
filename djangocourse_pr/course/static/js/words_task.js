@@ -7,8 +7,8 @@ $(document).ready(function() {
     const finalSentence = $('.final-sentence') // получаем предложение, собираемое пользователем
     const progressBarCells = $('.progress-bar-cell') // получаем прогресс бар
     const randomWordsFirstSentence = $('#randomwords_first') // получаем рандомные слова для первого предложения
-    const changeFinalSentence = document.querySelector('.final-sentence')
-    const finalSentencePlace = document.querySelector('.final-sentence-place')
+    const changeFinalSentence = document.querySelector('.final-sentence') // текст собираемого предложения
+    const finalSentencePlace = document.querySelector('.final-sentence-place') // блок с подчеркиванием собираемого предложения
     
     // флаги
     let formSubmittedFlag = false
@@ -17,10 +17,11 @@ $(document).ready(function() {
     let isFirstSentence = true
     let isUpdateWords = true
 
+    // подготавливаем рандомные слова для первого предложения, в виде массива
     let randomWordsFirstSentenceText = randomWordsFirstSentence.text()
     randomWordsFirstSentenceText = randomWordsFirstSentenceText.split(" ")
 
-    let allSentenceWords = []
+    let allSentenceWords = [] // создаем массив со словами для последующий предложений
 
     // метод перемешивание массива с требуемыми для предложения словами и дополнительными
     function shuffleArray(array) {
@@ -31,6 +32,7 @@ $(document).ready(function() {
         return array
     }
 
+    // функция обновления кнопок, после добавления/удаления слова
     function updateButtons(wordsArray) {
         wordsArray = shuffleArray(wordsArray)
         wordsArray = wordsArray.toString().toLowerCase().split(',')
@@ -87,7 +89,7 @@ $(document).ready(function() {
         if (isFirstSentence && isUpdateWords) {
             updateButtons(allWordsFirstSentence)
         } else if (allSentenceWords.length > 0 && isUpdateWords) {
-            updateButtons(allSentenceWords) // Этот массив обновляется при загрузке нового предложения
+            updateButtons(allSentenceWords) // этот массив обновляется при загрузке нового предложения
         }
     })
 
@@ -101,21 +103,25 @@ $(document).ready(function() {
             finalSentence.text(`${currentWordsOfSentence.join(' ')}`) // преобразуем снова в текст, и задаем
             
             if (isFirstSentence && isUpdateWords) {
-                updateButtons(allWordsFirstSentence)
+                updateButtons(allWordsFirstSentence) // обновляется при загрузке 1-го предложения
             } else if (allSentenceWords.length > 0 && isUpdateWords) {
-                updateButtons(allSentenceWords) // Этот массив обновляется при загрузке нового предложения
+                updateButtons(allSentenceWords) // этот массив обновляется при загрузке нового предложения
             }
         }
     })
 
+    // функция неправильно собраного предложения
     function incorrectSentence() {
+        // меняем стили, в случае если предложение собрано неправильно
         changeFinalSentence.style.color = 'red'
         finalSentencePlace.style.borderBottom = 'dashed 2px red'
         progressBarCells.eq(currentIndex).addClass('incorrect') // выделяем текущую ячейку прогресс-бара красным цветом
+        
         formSubmittedFlag = true
         updateSentenceFlag = false
         undoSentenceFlag = false
         isUpdateWords = false
+
         setTimeout(function() {
             $('#nexttaskform').submit() // отправка формы через 2 секунды
         }, 2000);
@@ -138,13 +144,15 @@ $(document).ready(function() {
             incorrectSentence()
         } else if (userWords.length === correctWords.length)  {
             if (userSentence === correctSentence) {
-                // Если предложение собрано правильно
+                // если предложение собрано правильно, меняем стили
                 changeFinalSentence.style.color = 'orange'
                 finalSentencePlace.style.borderBottom = 'dashed 2px orange'
+
                 formSubmittedFlag = true
                 updateSentenceFlag = false
                 undoSentenceFlag = false
                 isUpdateWords = false
+
                 setTimeout(function() {
                     $('#nexttaskform').submit() // отправка формы через 2 секунды
                 }, 2000)
@@ -152,7 +160,7 @@ $(document).ready(function() {
                 incorrectSentence()
             }
         } else {
-            // Если предложение ещё не собрано или неправильно
+            // если предложение ещё не собрано или неправильно
             changeFinalSentence.style.color = 'black'
             finalSentencePlace.style.borderBottom = 'dashed 2px rgb(28, 28, 28)'
             progressBarCells.eq(currentIndex).removeClass('incorrect')
@@ -188,7 +196,6 @@ $(document).ready(function() {
                     isFirstSentence = false
                     
                     let words = response.column1.split(" ") // получаем предложение, которое нужно собрать
-                    let buttons = $('.word-button') // получаем все кнопки, для сбора предложения
                     let randomWords = response.random_words // получаем рандомные слова для заполнения пустых кнопок ими
 
                     // получение требуемых слов из английского предложения

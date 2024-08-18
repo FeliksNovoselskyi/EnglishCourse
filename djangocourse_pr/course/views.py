@@ -9,6 +9,7 @@ import pandas
 def main_view(request):
     context = {}
     
+    # если пользователь авторизован
     if request.user.is_authenticated:
         context['username'] = request.user.username
         context['signed_in'] = True
@@ -19,6 +20,7 @@ def main_view(request):
 def course_view(request):
     context = {}
     
+    # если пользователь авторизован
     if request.user.is_authenticated:
         context['username'] = request.user.username
         context['signed_in'] = True
@@ -108,6 +110,7 @@ def course_view(request):
 # для страницы каждого задания
 def task_detail_view(request, task_id):
     context = {}
+    # если пользователь авторизован
     if request.user.is_authenticated:
         context['username'] = request.user.username
         context['signed_in'] = True
