@@ -14,9 +14,13 @@ $(document).ready(function() {
     let formSubmittedFlag = false
     let updateSentenceFlag = true
     let undoSentenceFlag = true
+    let isFirstSentence = true
+    let isUpdateWords = true
 
     let randomWordsFirstSentenceText = randomWordsFirstSentence.text()
     randomWordsFirstSentenceText = randomWordsFirstSentenceText.split(" ")
+
+    let allSentenceWords = []
 
     // метод перемешивание массива с требуемыми для предложения словами и дополнительными
     function shuffleArray(array) {
@@ -25,6 +29,16 @@ $(document).ready(function() {
             [array[i], array[j]] = [array[j], array[i]]
         }
         return array
+    }
+
+    function updateButtons(wordsArray) {
+        wordsArray = shuffleArray(wordsArray)
+        wordsArray = wordsArray.toString().toLowerCase().split(',')
+        buttons.each(function(index) {
+            if (index < wordsArray.length) {
+                $(this).text(wordsArray[index])
+            }
+        })
     }
 
     // получаем те слова, который нужны для сбора 1-го предложения
@@ -46,11 +60,7 @@ $(document).ready(function() {
     allWordsFirstSentence = allWordsFirstSentence.split(',')
 
     // заполняем все кнопки со словами для первого предложения
-    buttons.each(function(index) {
-        if (index < allWordsFirstSentence.length) {
-            $(this).text(allWordsFirstSentence[index])
-        }
-    })
+    updateButtons(allWordsFirstSentence)
 
     // функция обновления прогресса
     function updateProgressBar() {
@@ -73,6 +83,12 @@ $(document).ready(function() {
         } else if (!currentSentence && updateSentenceFlag) {
             finalSentence.text(buttonText) // просто задаем новое слово, ибо до него ничего нет
         }
+
+        if (isFirstSentence && isUpdateWords) {
+            updateButtons(allWordsFirstSentence)
+        } else if (allSentenceWords.length > 0 && isUpdateWords) {
+            updateButtons(allSentenceWords) // Этот массив обновляется при загрузке нового предложения
+        }
     })
 
     // обрабатываем событие клика на кнопку удаления последнего слова
@@ -93,6 +109,7 @@ $(document).ready(function() {
         formSubmittedFlag = true
         updateSentenceFlag = false
         undoSentenceFlag = false
+        isUpdateWords = false
         setTimeout(function() {
             $('#nexttaskform').submit() // отправка формы через 2 секунды
         }, 2000);
@@ -121,6 +138,7 @@ $(document).ready(function() {
                 formSubmittedFlag = true
                 updateSentenceFlag = false
                 undoSentenceFlag = false
+                isUpdateWords = false
                 setTimeout(function() {
                     $('#nexttaskform').submit() // отправка формы через 2 секунды
                 }, 2000)
@@ -160,13 +178,15 @@ $(document).ready(function() {
 
                     // обновление прогресса после верного прохождения предложения
                     updateProgressBar()
+
+                    isFirstSentence = false
                     
                     let words = response.column1.split(" ") // получаем предложение, которое нужно собрать
                     let buttons = $('.word-button') // получаем все кнопки, для сбора предложения
                     let randomWords = response.random_words // получаем рандомные слова для заполнения пустых кнопок ими
 
                     // получение требуемых слов из английского предложения
-                    let allSentenceWords = words.slice(0, 9)
+                    allSentenceWords = words.slice(0, 9)
 
                     // проверка на то, сколько требуемых для выполнения предложения слов из 9
                     // исходя из этого, вычисление сколько кнопок остаются пустыми, и в массиве заполняются пустые места для них
@@ -183,11 +203,7 @@ $(document).ready(function() {
                     allSentenceWords = allSentenceWords.split(',')
 
                     // заполнение текста кнопок для сбора слов
-                    buttons.each(function(index) {
-                        if (index < allSentenceWords.length) {
-                            $(this).text(allSentenceWords[index])
-                        }
-                    });
+                    updateButtons(allSentenceWords)
                     
                     // очистка предыдущего предложения от его слов
                     // для того чтобы новое предложение было изначально пустым
@@ -195,6 +211,7 @@ $(document).ready(function() {
                     formSubmittedFlag = false
                     updateSentenceFlag = true
                     undoSentenceFlag = true
+                    isUpdateWords = true
                 }
             },
         });
