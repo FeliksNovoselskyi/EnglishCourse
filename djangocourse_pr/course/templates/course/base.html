@@ -21,6 +21,15 @@
             <a class='header-links' href="{% url 'main' %}">Головна</a>
             <a class='header-links' href="{% url 'course' %}">Курс</a>
         </div>
+
+        {% if signed_in %}
+            {% if username %}
+                <a class='header-links' href="{% url 'auth' %}">{{username}}</a>
+            {% endif %}
+        {% else %}
+            <a class='header-links' href="{% url 'auth' %}">Увійти</a>
+        {% endif %}
+
     </header>
 
     <main>

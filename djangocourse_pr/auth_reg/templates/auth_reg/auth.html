@@ -1,0 +1,26 @@
+{% extends 'course/base.html' %}
+{% load static %}
+
+{% block links %}
+    <link rel="stylesheet" href="{% static 'auth_reg/css/auth_reg.css' %}">
+{% endblock %}
+
+{% block content %}
+    <div class="auth-reg-block">
+        <h1>Авторизація</h1>
+        <div class="head-links">
+            <p>Немає акаунту?</p>
+            <a href="{% url 'reg' %}">Створити акаунт</a>
+        </div>
+        <form action="" method="post">
+            {% csrf_token %}
+            <input type="text" name="username_inp" placeholder="Ім'я">
+            <input type="password" name="password_inp" placeholder="Пароль">
+
+            <input type="submit" name="submit_btn" class="submit-btn" value="Відправити">
+            {% if signed_in %}
+                <input type="submit" name="leave_btn" class="submit-btn" value="Вийти">
+            {% endif %}
+        </form>
+    </div>
+{% endblock %}

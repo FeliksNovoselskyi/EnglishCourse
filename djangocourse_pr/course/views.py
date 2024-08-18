@@ -7,10 +7,22 @@ import pandas
 
 # Create your views here.
 def main_view(request):
-    return render(request, 'course/main.html')
+    context = {}
+    
+    if request.user.is_authenticated:
+        context['username'] = request.user.username
+        context['signed_in'] = True
+        
+    return render(request, 'course/main.html', context)
 
 # для страницы курса со всеми заданиями
-def course_view(request):    
+def course_view(request):
+    context = {}
+    
+    if request.user.is_authenticated:
+        context['username'] = request.user.username
+        context['signed_in'] = True
+        
     if request.method == 'POST':
         # если добавляем задание
         if 'add_task' in request.POST:
@@ -89,11 +101,17 @@ def course_view(request):
             except Task.DoesNotExist:
                 return JsonResponse({'success': False, 'error': 'Завдання не знайдено'})
     
-    return render(request, 'course/course.html', {'all_tasks': Task.objects.all()})
+    context['all_tasks'] = Task.objects.all()
+    
+    return render(request, 'course/course.html', context)
 
 # для страницы каждого задания
 def task_detail_view(request, task_id):
     context = {}
+    if request.user.is_authenticated:
+        context['username'] = request.user.username
+        context['signed_in'] = True
+        
     task = get_object_or_404(Task, id=task_id)
     # получаем список задач по id 
     task_data_list = list(task.task_data.all().order_by('id'))

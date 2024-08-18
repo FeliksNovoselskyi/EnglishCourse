@@ -17,10 +17,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from course.views import *
+from auth_reg.views import *
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', main_view, name='main'),
+    path('auth/', auth_view, name='auth'),
+    path('reg/', reg_view, name='reg'),
     path('course/', course_view, name='course'),
     path('course/<int:task_id>/', task_detail_view, name='task_detail'),
 ]
