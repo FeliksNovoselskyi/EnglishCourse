@@ -99,6 +99,12 @@ $(document).ready(function() {
             const currentWordsOfSentence = currentSentence.split(" ")
             currentWordsOfSentence.pop() // удаляем последний элемент (последнее слово)
             finalSentence.text(`${currentWordsOfSentence.join(' ')}`) // преобразуем снова в текст, и задаем
+            
+            if (isFirstSentence && isUpdateWords) {
+                updateButtons(allWordsFirstSentence)
+            } else if (allSentenceWords.length > 0 && isUpdateWords) {
+                updateButtons(allSentenceWords) // Этот массив обновляется при загрузке нового предложения
+            }
         }
     })
 
