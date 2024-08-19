@@ -134,6 +134,24 @@ def task_detail_view(request, task_id):
         # получаем задание на котором находимся
         current_index = int(request.POST.get('current_index', 0))
         
+        # Проверка правильности предложения
+        is_correct = int(request.POST.get('is_correct', 0))
+        print(is_correct)
+
+        # Обновление или создание записи прогресса пользователя
+        user_progress, created = UserProgress.objects.get_or_create(
+            user=request.user,
+            task=task,
+            defaults={'progress_data': {}}
+        )
+
+        # Сохраняем прогресс
+        progress_data = user_progress.progress_data
+        progress_data[current_index] = is_correct
+        user_progress.progress_data = progress_data
+        user_progress.save()
+
+        # Проверка, есть ли следующее предложение
         if current_index < len(task_data_list) - 1:
             next_data = task_data_list[current_index + 1]
             

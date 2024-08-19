@@ -54,6 +54,7 @@
     <div class="progress-bar">
         {% for i in sentences_len %}
             <div class="progress-bar-cell">{{i}}</div>
+            <!-- <div class="{% if user_progress.get_i == 1 %}correct{% elif user_progress.get_i == 0 %}incorrect{% endif %}"></div> -->
         {% endfor %}
     </div>
 {% endblock %}

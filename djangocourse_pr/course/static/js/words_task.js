@@ -167,10 +167,14 @@ $(document).ready(function() {
         }
     }
 
+    
+
     setInterval(checkSentenceByInterval, 100)
     
     $('#nexttaskform').submit(function(event) {
         // не даем форме сразу отправиться
+        let isCorrect = changeFinalSentence.style.color === 'orange' ? 1 : 0;
+        console.log(isCorrect)
         event.preventDefault()
 
         // проверяем, верно ли собрано предложение
@@ -179,6 +183,7 @@ $(document).ready(function() {
             type: 'POST',
             data: {
                 'current_index': currentIndex,
+                'is_correct': isCorrect,
                 'csrfmiddlewaretoken': $('input[name="csrfmiddlewaretoken"]').val(),
             },
             success: function(response) {

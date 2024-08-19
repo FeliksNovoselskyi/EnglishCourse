@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 # Create your models here.
 # главная модель - урок
@@ -23,3 +24,10 @@ class TaskData(models.Model):
 class AdditionalWords(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='additional_words')
     word = models.CharField(max_length=255)
+    
+class UserProgress(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    task = models.ForeignKey(Task, on_delete=models.CASCADE)
+    current_index = models.PositiveIntegerField(default=0)
+    completed_sentences = models.ManyToManyField(TaskData, related_name='completed_by_users', blank=True)
+    progress_data = models.JSONField(default=list)
