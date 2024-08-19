@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.db.utils import IntegrityError
+from auth_reg.models import *
 
 # Create your views here.
 # функция обработки авторизации
@@ -30,7 +31,7 @@ def auth_view(request):
                     login(request, user)
                     return redirect('auth')
                 else:
-                    context["error"] = 'Неверный логин или пароль'
+                    context["error_message"] = 'Логін або пароль не вірні'
             else:
                 context['error_message'] = 'Заповніть усі поля'
     # если пользователь нажал кнопку выхода
@@ -61,10 +62,14 @@ def reg_view(request):
                 # проверка наличия такого пользователя
                 try:
                     # создание пользователя
-                    User.objects.create_user(
+                    user = User.objects.create_user(
                         username=username,
                         password=password,
                     )
+                    
+                    # создание профиля пользователя
+                    UserProfile.objects.create(user=user)
+                    
                     return redirect('auth')
                 except IntegrityError:
                     context["error"] = 'Такий користувач вже існує'

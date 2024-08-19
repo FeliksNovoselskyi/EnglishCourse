@@ -3,12 +3,12 @@ from django.template.loader import render_to_string
 from django.http import JsonResponse
 from django.urls import reverse
 from .models import *
+from auth_reg.models import *
 import pandas
 
 # Create your views here.
 def main_view(request):
     context = {}
-    
     # если пользователь авторизован
     if request.user.is_authenticated:
         context['username'] = request.user.username
@@ -20,6 +20,15 @@ def main_view(request):
 def course_view(request):
     context = {}
     
+    try:
+        user_status = UserProfile.objects.get(user=request.user)
+        
+        if user_status.role == 'teacher':
+            context['user_status'] = 'teacher'
+        elif user_status.role == 'student':
+            context['user_status'] = 'student'
+    except UserProfile.DoesNotExist: pass
+        
     # если пользователь авторизован
     if request.user.is_authenticated:
         context['username'] = request.user.username

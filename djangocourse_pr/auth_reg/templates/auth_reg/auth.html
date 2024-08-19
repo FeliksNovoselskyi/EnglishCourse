@@ -17,6 +17,10 @@
             <input type="text" name="username_inp" placeholder="Ім'я">
             <input type="password" name="password_inp" placeholder="Пароль">
 
+            {% if error_message %}
+                <p>{{error_message}}</p>
+            {% endif %}
+
             <input type="submit" name="submit_btn" class="submit-btn" value="Відправити">
             {% if signed_in %}
                 <input type="submit" name="leave_btn" class="submit-btn" value="Вийти">

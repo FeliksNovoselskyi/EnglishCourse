@@ -18,6 +18,10 @@
         <input type="password" name="password_inp" placeholder="Пароль">
         <input type="password" name="conf_password_inp" placeholder="Підтвердіть пароль">
 
+        {% if error_message %}
+            <p>{{error_message}}</p>
+        {% endif %}
+        
         <input type="submit" name="submit_btn" class="submit-btn" value="Відправити">
     </form>
 </div>

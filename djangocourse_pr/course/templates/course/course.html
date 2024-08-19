@@ -26,12 +26,14 @@
             </div>
         {% endfor %}
 
-        <div class="course-block add-task-block" data-bs-toggle="modal" data-bs-target="#exampleModal">
-            <div class="course-icon-block add-task-icon-block">
-                <img src="{% static 'images/add.png' %}" alt="add-img" class="course-imgs">
+        {% if user_status == 'teacher' %}
+            <div class="course-block add-task-block" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                <div class="course-icon-block add-task-icon-block">
+                    <img src="{% static 'images/add.png' %}" alt="add-img" class="course-imgs">
+                </div>
+                <button type="button" class="courses-buttons"><p class="course-text">Додати</p></button>
             </div>
-            <button type="button" class="courses-buttons"><p class="course-text">Додати</p></button>
-        </div>
+        {% endif %}
     </div>
 
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
