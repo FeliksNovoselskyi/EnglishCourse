@@ -1,10 +1,10 @@
 from django import forms
-from .models import Task
+from .models import *
 
 class TaskForm(forms.ModelForm):
     excel_file = forms.FileField(required=False, label='Upload Excel file')
     additional_words_file = forms.FileField(required=False, label='Upload Excel file for AdditionalWords')
 
     class Meta:
-        model = Task
+        model = UserProgress
         fields = ['name', 'excel_file', 'additional_words_file']
