@@ -143,8 +143,39 @@ def course_view(request):
             # # на крайняк, если задания каким-то образом не будет
             # except Task.DoesNotExist:
             #     return JsonResponse({'success': False, 'error': 'Завдання не знайдено'})
-    
+            
+        if 'add_lesson' in request.POST:
+            lesson_name = request.POST.get('lessonname')
+            lesson_id = request.POST.get('lesson_id')
+            
+            if lesson_name:
+                lesson = Lesson.objects.create(lesson_name=lesson_name)
+                lesson_id = lesson.id
+                
+                lesson_html = render_to_string('course/lesson_block.html', {
+                    'lesson': lesson    
+                }, request=request)
+                
+                return JsonResponse({
+                    'addLesson': True,
+                    'lessonId': lesson_id,
+                    'lessonName': lesson_name,
+                    'lesson_html': lesson_html,
+                })
+            else:
+                return JsonResponse({'error': 'Заповніть поле з назвою уроку'})
+        
+        if 'delete_lesson' in request.POST:
+            lesson_id = request.POST.get('lesson_id')
+            try:
+                lesson = Lesson.objects.get(id=lesson_id)
+                lesson.delete()
+                return JsonResponse({'deleteLesson': True})
+            except Lesson.DoesNotExist:
+                return JsonResponse({'success': False, 'error': 'Урок не знайдений'})
     # context['all_tasks'] = Task.objects.all()
+    context['all_lessons'] = Lesson.objects.all()
+    
     return render(request, 'course/course.html', context)
 
 # для страницы каждого задания

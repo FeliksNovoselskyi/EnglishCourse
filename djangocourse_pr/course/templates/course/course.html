@@ -8,7 +8,26 @@
 {% block content %}
     <h1>Курси</h1>
     <div id="courses">
-        {% for task in all_tasks %}
+        {% if user_status == 'teacher' %}
+            <div class="adding-block">
+                <button type="button" class="courses-buttons" data-bs-toggle="modal" data-bs-target="#exampleLessonModal"><p class="course-text">Створити урок</p></button>
+                <button type="button" class="courses-buttons" data-bs-toggle="modal" data-bs-target="#exampleModal"><p class="course-text">Додати завдання</p></button>
+            </div>
+        {% endif %}
+
+        <div class="lessons">
+            {% for lesson in all_lessons %}
+                <div class="lessons-from-backend">
+                    <h4 class="lesson-name">{{lesson.lesson_name}}</h3>
+                    <form method="post" class="delete-lesson-form" action="">
+                        {% csrf_token %}
+                        <input type="hidden" name="lesson_id" value="{{lesson.id}}">
+                        <button type="submit" name="delete_lesson" class="delete-lesson-btn"><img src="{% static 'images/delete.png' %}" alt="delete-lesson-img" class="delete-lessons-icon"></button>
+                    </form>
+                </div>
+            {% endfor %}
+        </div>
+        <!-- {% for task in all_tasks %}
             <div class="course-block">
                 <div class="course-icon-block clickable-task" data-task-url="{% url 'task_detail' task.id %}">
                     <img src="{% static 'images/finished.png' %}" alt="finished-img" class="course-imgs">
@@ -33,7 +52,7 @@
                 </div>
                 <button type="button" class="courses-buttons"><p class="course-text">Додати</p></button>
             </div>
-        {% endif %}
+        {% endif %} -->
     </div>
 
     <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -43,6 +62,11 @@
                 <div class="add-change-task-name">
                     <form action="" method="post" id="addnameform" enctype="multipart/form-data">
                         {% csrf_token %}
+                        <select id="dropdown-lessons" name="dropdown-lessons">
+                            {% for lesson in all_lessons %}
+                                <option value="{{lesson.id}}">{{lesson.lesson_name}}</option>
+                            {% endfor %}
+                        </select>
                         <p class="course-text">Додайте назву завданню:</p>
                         <input type="text" maxlength="10" name="taskname">
                         <p>Речення:</p>
@@ -59,5 +83,26 @@
             </div>
           </div>
         </div>
-      </div>
+    </div>
+
+    <div class="modal fade" id="exampleLessonModal" tabindex="-1" aria-labelledby="exampleLessonModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+                <div class="add-change-lesson-name">
+                    <form action="" method="post" id="addlessonform">
+                        {% csrf_token %}
+                        <p class="course-text">Додайте назву уроку:</p>
+                        <input type="text" name="lessonname">
+                        
+                        <p id="error-message-lesson"></p>
+
+                        <input type="submit" value="Створити" name="add_lesson">
+                    </form>
+                </div>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+          </div>
+        </div>
+    </div>
 {% endblock %}

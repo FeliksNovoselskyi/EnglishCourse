@@ -1,7 +1,30 @@
 #courses {
     display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.adding-block {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
+}
+
+.lesson-name {
+    text-decoration: underline;
+}
+
+.lessons {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.lessons-from-backend {
+    display: flex;
+    flex-direction: row;
+    gap: 20px;
 }
 
 .course-text {
@@ -41,6 +64,15 @@
     height: 35px;
 }
 
+.delete-lessons-icon {
+    width: 30px;
+    height: 30px;
+}
+
+.delete-lesson-btn {
+    border: transparent;
+    background-color: transparent;
+}
 
 .small-course-imgs {
     width: 35px;

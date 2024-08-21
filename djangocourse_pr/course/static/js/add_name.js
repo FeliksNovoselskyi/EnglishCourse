@@ -1,5 +1,66 @@
 
 $(document).ready(function() {
+    $('#addlessonform').submit(function(event) {
+        event.preventDefault()
+
+        var $form = $(this)
+        var lessonId = $form.find('input[name=lesson_id]').val()
+        var lessonName = $('input[name=lessonname]').val()
+        
+        $.ajax({
+            url: '/course/',
+            type: 'POST',
+            data: {
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                add_lesson: true,
+                lessonname: lessonName,
+                lesson_id: lessonId,
+            },
+            success: function(response) {
+                if (response.error) {
+                    $('#error-message-lesson').text(response.error)
+                } else if (response.addLesson) {
+                    $('.lessons').append(response.lesson_html)
+                    $('#dropdown-lessons').append(`
+                        <option value="${response.lessonId}">${response.lessonName}</option>
+                    `)
+                }
+            }
+        })
+    })
+
+    $('.lessons').on('submit', '.delete-lesson-form', function(event) {
+        event.preventDefault()
+
+        var $form = $(this)
+        var lessonId = $form.find('input[name=lesson_id]').val()
+
+        $.ajax({
+            url: '/course/',
+            type: 'POST',
+            data: {
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                lesson_id: lessonId,
+                delete_lesson: true
+            },
+            success: function(response) {
+                if (response.deleteLesson) {
+                    $form.closest('.lessons-from-backend').remove()
+
+                    var $optionToRemove = $('#dropdown-lessons').find(`option[value="${lessonId}"]`);
+                    if ($optionToRemove.length) {
+                        $optionToRemove.remove();
+                        console.log('Опция удалена:', lessonId);
+                    } else {
+                        console.log('Не найдена опция для удаления:', lessonId);
+                    }
+                } else {
+                    alert('Помилка при видаленні уроку: ' + response.error)
+                }
+            },
+        })
+    })
+
     $('#addnameform').submit(function(event) {
         // не даем форме сразу отправиться
         event.preventDefault()
@@ -36,7 +97,7 @@ $(document).ready(function() {
     });
 
     // обрабатываем удаление задания через ajax
-    $('#courses').on('submit', 'form', function(event) {
+    $('#tasks').on('submit', 'form', function(event) {
         event.preventDefault()
 
         var $form = $(this) // получаем нашу форму

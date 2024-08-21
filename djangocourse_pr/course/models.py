@@ -31,6 +31,9 @@ from django.contrib.auth.models import User
 #     current_index = models.PositiveIntegerField(default=0)
 #     completed_sentences = models.ManyToManyField(TaskData, related_name='completed_by_users', blank=True)
     
+class Lesson(models.Model):
+    lesson_name = models.CharField(max_length=255, blank=True, null=True)
+    
 class UserProgress(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     task_name = models.CharField(max_length=10)
