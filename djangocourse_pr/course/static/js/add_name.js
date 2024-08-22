@@ -47,12 +47,9 @@ $(document).ready(function() {
                 if (response.deleteLesson) {
                     $form.closest('.lessons-from-backend').remove()
 
-                    var $optionToRemove = $('#dropdown-lessons').find(`option[value="${lessonId}"]`);
+                    var $optionToRemove = $('#dropdown-lessons').find(`option[value="${lessonId}"]`)
                     if ($optionToRemove.length) {
-                        $optionToRemove.remove();
-                        console.log('Опция удалена:', lessonId);
-                    } else {
-                        console.log('Не найдена опция для удаления:', lessonId);
+                        $optionToRemove.remove()
                     }
                 } else {
                     alert('Помилка при видаленні уроку: ' + response.error)
@@ -65,6 +62,8 @@ $(document).ready(function() {
         // не даем форме сразу отправиться
         event.preventDefault()
 
+        selectedLesson = document.querySelector('#dropdown-lessons')
+        
         // создаем formData чтобы можно было отправлять файлы из формы через ajax
         var formData = new FormData()
         // добавляем в formData csrf_token и значения из формы, чтобы переправить их на бекенд
@@ -72,6 +71,7 @@ $(document).ready(function() {
         formData.append('taskname', $('input[name=taskname]').val())
         formData.append('taskfile', $('input[name=taskfile]')[0].files[0])
         formData.append('additional_words_file', $('input[name=additional_words_file]')[0].files[0])
+        formData.append('selected_lesson_value', selectedLesson.value)
         formData.append('add_task', true)
 
         $.ajax({
@@ -84,9 +84,12 @@ $(document).ready(function() {
                 if (response.addName) {
                     // тут типо все норм и все правильно, ошибок в заполнении поля нет!!
                     $('#error-message').text(response.error)
-                    // добавляем новую задачу с помощью метода before
-                    // тут он нужен чтобы добавить задание перед блоком, который их добавляет (для красоты)
-                    $('.course-block.add-task-block').before(response.task_html)
+                    
+                    var lessonBlock = $('.lessons-from-backend').filter(function() {
+                        return $(this).find('input[name=lesson_id]').val() === selectedLesson.value
+                    })
+    
+                    lessonBlock.find('.lesson-tasks').append(response.task_html)
                 }
                 if (response.error) {
                     // вывод ошибок пользователя при создании задания
@@ -97,7 +100,7 @@ $(document).ready(function() {
     });
 
     // обрабатываем удаление задания через ajax
-    $('#tasks').on('submit', 'form', function(event) {
+    $('.lessons').on('submit', '.delete-task-form', function(event) {
         event.preventDefault()
 
         var $form = $(this) // получаем нашу форму

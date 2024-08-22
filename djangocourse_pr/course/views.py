@@ -42,9 +42,9 @@ def course_view(request):
             task_name = request.POST.get('taskname')
             task_file = request.FILES.get('taskfile')
             additional_words_file = request.FILES.get('additional_words_file')
+            selected_lesson_value = request.POST.get('selected_lesson_value')
             
-            if task_name and task_file and additional_words_file:
-                # если указан файл с заданием, парсим его и добавляем в бд
+            if task_name and task_file and additional_words_file and selected_lesson_value:
                 sentences = pandas.read_excel(task_file)
                 additional_words = pandas.read_excel(additional_words_file)
                 
@@ -53,10 +53,10 @@ def course_view(request):
                 additional_words_list = []
 
                 for row in sentences.itertuples(index=False):
-                    # column1_value = row[0].split()  # английское предложение
                     column1_value = row[0] # английское предложение
                     column2_value = row[1] # украинское предложение
                     
+                    # Подготавливаем предложения и списки с ними для загрузки в модель при создании урока
                     cleaned_value_column1 = column1_value.strip()
                     lines_column1 = cleaned_value_column1.split('\n')
                     cleaned_value_column2 = column2_value.strip()
@@ -90,59 +90,45 @@ def course_view(request):
                 # print(ukrainian_sentences)
                 # print(additional_words_list)
                 
-                UserProgress.objects.create(
-                    user = request.user,
+                selected_lesson = Lesson.objects.get(id=selected_lesson_value)
+                
+                task = UserProgress.objects.create(
+                    lesson = selected_lesson,
                     task_name = task_name,
                     english_sentences = english_sentences,
                     ukrainian_sentences = ukrainian_sentences,
                     additional_words = additional_words_list,
                 )
                 
-                user_progress = UserProgress.objects.get(user=request.user, task_name=task_name)
-                print(user_progress.ukrainian_sentences)
-                        
-                        # print(word_value)
- 
-                        # AdditionalWords.objects.create(
-                        #     task=task,
-                        #     word=word_value,
-                        # )
+                task_url = reverse('task_detail', args=[task.id])
+                print(task_url)
                 
-                        
-                # получаем ссылку, по которой находится страница с заданием, берем по id
-                # task_url = reverse('task_detail', args=[task.id])
-                
-                # рендерим из шаблона в строку блок с заданием
-                # чтобы можно было через ajax добавить без проблемчтобы можно было через ajax добавить без проблем
-                # иначе будут проблемы с удалением, и переходом на страницу сразу после добавления задания
-                # task_html = render_to_string('course/task_block.html', {
-                #     'task': task,
-                #     'task_url': task_url,
-                # }, request=request)
-                
-                # отправляем ajax-у что все круто и можно добавлять, передаем шаблон который нужно добавить на страницу
-                # return JsonResponse({
-                #     'addName': True,
-                #     'error': '',
-                #     # 'task_html': task_html,
-                # })
+                task_html = render_to_string('course/task_block.html', {
+                    'task': task,
+                    'task_url': task_url,
+                }, request=request)
+        
+                return JsonResponse({
+                    'addName': True,
+                    'error': '',
+                    'task_html': task_html,
+                })
             else:
-                # пишем, что не заполнено поле, отправляя это ajax-у
                 return JsonResponse({'error': 'Заповніть усі поля'})
         
         # если удаляем задание
         if 'delete_task' in request.POST:
             # узначем, какое задание надо удалять
             task_id = request.POST.get('task_id')
-            # try:
-            #     # получаем его из бд и удаляем на стороне сервера
-            #     # task = Task.objects.get(id=task_id)
-            #     task.delete()
-            #     # отправляем ajax-у, что можно удалять задание на стороне клиента
-            #     return JsonResponse({'deleteTask': True})
-            # # на крайняк, если задания каким-то образом не будет
-            # except Task.DoesNotExist:
-            #     return JsonResponse({'success': False, 'error': 'Завдання не знайдено'})
+            try:
+                # получаем его из бд и удаляем на стороне сервера
+                task = UserProgress.objects.get(id=task_id)
+                task.delete()
+                # отправляем ajax-у, что можно удалять задание на стороне клиента
+                return JsonResponse({'deleteTask': True})
+            # на крайняк, если задания каким-то образом не будет
+            except UserProgress.DoesNotExist:
+                return JsonResponse({'success': False, 'error': 'Завдання не знайдено'})
             
         if 'add_lesson' in request.POST:
             lesson_name = request.POST.get('lessonname')
@@ -173,8 +159,18 @@ def course_view(request):
                 return JsonResponse({'deleteLesson': True})
             except Lesson.DoesNotExist:
                 return JsonResponse({'success': False, 'error': 'Урок не знайдений'})
-    # context['all_tasks'] = Task.objects.all()
-    context['all_lessons'] = Lesson.objects.all()
+            
+    all_lessons = Lesson.objects.all()
+    lessons_with_tasks = []
+    
+    for lesson in all_lessons:
+        tasks = UserProgress.objects.filter(lesson=lesson)
+        lessons_with_tasks.append({
+            'lesson': lesson,
+            'tasks': tasks,
+        })
+    
+    context['lessons_with_tasks'] = lessons_with_tasks
     
     return render(request, 'course/course.html', context)
 

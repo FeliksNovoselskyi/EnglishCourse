@@ -4,14 +4,14 @@
     <div class="course-icon-block clickable-task" onclick="window.location.href='{{task_url}}'">
         <img src="{% static 'images/finished.png' %}" alt="finished-img" class="course-imgs">
     </div>
-
     <div class="task-change-icons">
-        <form method="post" id="delete-task-form" action="">
+        <form method="post" class="delete-task-form" action="">
             {% csrf_token %}
             <input type="hidden" name="task_id" value="{{task.id}}">
-            <button type="submit" name="delete_task" class="delete-task-btn"><img src="{% static 'images/delete.png' %}" alt="change-task-img" class="small-course-imgs"></button>
+            <button type="submit" name="delete_task" class="delete-task-btn">
+                <img src="{% static 'images/delete.png' %}" alt="change-task-img" class="small-course-imgs">
+            </button>
         </form>
     </div>
-
-    <div class="task-name-popup" data-task-url="{% url 'task_detail' task.id %}">{{task.name}}</div>
+    <div class="task-name-popup" onclick="window.location.href='{{task_url}}'">{{task.task_name}}</div>
 </div>

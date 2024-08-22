@@ -23,8 +23,19 @@
 
 .lessons-from-backend {
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     gap: 20px;
+}
+
+.lesson-tasks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.lesson-head {
+    display: flex;
+    flex-direction: row;
 }
 
 .course-text {
@@ -122,6 +133,7 @@
     white-space: nowrap;
     z-index: 1000;
     opacity: 0;
+    cursor: pointer;
     transition: all 150ms ease-in-out;
 }
 

@@ -1,9 +1,15 @@
 {% load static %}
 <div class="lessons-from-backend">
-    <h4 class="lesson-name">{{lesson.lesson_name}}</h3>
-    <form method="post" class="delete-lesson-form" action="">
-        {% csrf_token %}
-        <input type="hidden" name="lesson_id" value="{{lesson.id}}">
-        <button type="submit" name="delete_lesson" class="delete-lesson-btn"><img src="{% static 'images/delete.png' %}" alt="delete-lesson-img" class="delete-lessons-icon"></button>
-    </form>
+    <div class="lesson-head">
+        <h4 class="lesson-name">{{lesson.lesson_name}}</h3>
+        <form method="post" class="delete-lesson-form" action="">
+            {% csrf_token %}
+            <input type="hidden" name="lesson_id" value="{{lesson.id}}">
+            <button type="submit" name="delete_lesson" class="delete-lesson-btn"><img src="{% static 'images/delete.png' %}" alt="delete-lesson-img" class="delete-lessons-icon"></button>
+        </form>
+    </div>
+
+    <div class="lesson-tasks">
+
+    </div>
 </div>
