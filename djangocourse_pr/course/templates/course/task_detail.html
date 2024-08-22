@@ -10,7 +10,7 @@
 {% endblock %}
 
 {% block content %}
-    <h1>{{task.name}}</h1>
+    <h1>{{task.task_name}}</h1>
 
     <div class="task-buttons">
         <!-- кнопка, ну или ссылка для возвращения на страницу курса -->
@@ -24,10 +24,10 @@
         
     <div id="task-data" data-current-index="0" data-task-id="{{task.id}}">
         <!-- рандомные слова для первого предложения -->
-        <p id="randomwords_first" style="display: none; visibility: hidden;">{% for word in randomwords_first %} {{word}}{% endfor %}</p>
+        <p id="randomwords_first" style="display: none; visibility: hidden;">{% for word in additional_words_first %} {{word}}{% endfor %}</p>
         <!-- английское предложения, для первого предложения -->
-        <p class="sentence" id="column1" style="display: none; visibility: hidden;">{{first_data.column1}}</p>
-        <p class="sentence" id="column2">{{first_data.column2}}</p>
+        <p class="sentence" id="column1" style="display: none; visibility: hidden;">{{first_english_sentence}}</p>
+        <p class="sentence" id="column2">{{first_ukrainian_sentence}}</p>
         <div class="final-sentence-undo">
             <div class="final-sentence-place">
                 <p class="final-sentence"></p>

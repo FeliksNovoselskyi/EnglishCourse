@@ -174,7 +174,7 @@ def course_view(request):
     
     return render(request, 'course/course.html', context)
 
-# для страницы каждого задания
+# Для страницы каждого задания
 def task_detail_view(request, task_id):
     context = {}
     # если пользователь авторизован
@@ -182,60 +182,40 @@ def task_detail_view(request, task_id):
         context['username'] = request.user.username
         context['signed_in'] = True
         
-    # task = get_object_or_404(Task, id=task_id)
-    # получаем список задач по id 
-    # task_data_list = list(task.task_data.all().order_by('id'))
-    # получаем из модели дополнительных слов дополнительные слова
-    # random_words = list(AdditionalWords.objects.values_list('word', flat=True))
-
-    # Обновление или создание записи прогресса пользователя
-    # user_progress, created = UserProgress.objects.get_or_create(
-    #     user=request.user,
-    #     # task=task,
-    #     defaults={'progress_data': {}}
-    # )
+    task = get_object_or_404(UserProgress, id=task_id)
+    
+    english_sentences = task.english_sentences
+    ukrainian_sentences = task.ukrainian_sentences
+    additional_words = task.additional_words
     
     if request.method == 'POST':
-        # получаем задание на котором находимся
+        # Получаем задание на котором находимся
         current_index = int(request.POST.get('current_index', 0))
-        
-        # Проверка правильности предложения
-        is_correct = int(request.POST.get('is_correct', 0))
 
-        # Сохраняем прогресс
-        # progress_data = user_progress.progress_data
-        # progress_data[current_index] = is_correct
-        # user_progress.progress_data = progress_data
-        # user_progress.current_index = current_index
-        # user_progress.save()
-        
-        # print(user_progress.current_index)
-
-        # Проверка, есть ли следующее предложение
-        # if current_index < len(task_data_list) - 1:
-        #     next_data = task_data_list[current_index + 1]
+        if current_index < len(english_sentences) - 1:
+            next_english_sentence = english_sentences[current_index + 1]
+            next_ukrainian_sentence = ukrainian_sentences[current_index + 1]
             
-        #     # передаем ajax-у предложения на укр. и англ., и индекс следующего, а также дополнительные слова
-        #     response_data = {
-        #         'column1': next_data.column1,
-        #         'column2': next_data.column2,
-        #         'next_index': user_progress.current_index + 1,
-        #         # 'random_words': random_words,
-        #     }
-        # else:
-        #     response_data = {'error': True}
+            response_data = {
+                'english_sentence': next_english_sentence,
+                'ukrainian_sentence': next_ukrainian_sentence,
+                'next_index': current_index + 1,
+                'additional_words': additional_words,
+            }
+        else:
+            response_data = {'error': True}
 
-        # return JsonResponse(response_data)
+        return JsonResponse(response_data)
 
     # получаем первое предложение
-    # first_data = task.task_data.first()
-    # context['task'] = task # передаем конкретное задание, на котором находимся через контекст
-    # context['first_data'] = first_data # передаем первое предложение через контекст
-    # context['sentences_len'] = range(1, len(task_data_list) + 1) # передаем количество предложений через контекст
-    # context['randomwords_first'] = random_words # передаем дополнительные слова через контекст
+    first_english_sentence = english_sentences[0]
+    first_ukrainian_sentence = ukrainian_sentences[0]
+    context['task'] = task  # передаем конкретное задание, на котором находимся через контекст
+    context['first_english_sentence'] = first_english_sentence  # передаем первое предложение на английском через контекст
+    context['first_ukrainian_sentence'] = first_ukrainian_sentence  # передаем первое предложение на украинском через контекст
+    context['sentences_len'] = range(1, len(english_sentences) + 1)  # передаем количество предложений через контекст
+    context['additional_words_first'] = additional_words  # передаем дополнительные слова через контекст
     
     # context['task_after_restart'] = user_progress.current_index
-    # print(TaskData.objects.get(id=571))
-    # print(len(task_data_list))
     
     return render(request, 'course/task_detail.html', context)

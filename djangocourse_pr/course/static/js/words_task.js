@@ -167,14 +167,12 @@ $(document).ready(function() {
         }
     }
 
-    
-
     setInterval(checkSentenceByInterval, 100)
     
     $('#nexttaskform').submit(function(event) {
         // не даем форме сразу отправиться
         let isCorrect = changeFinalSentence.style.color === 'orange' ? 1 : 0;
-        console.log(isCorrect)
+        // console.log(isCorrect)
         event.preventDefault()
 
         // проверяем, верно ли собрано предложение
@@ -183,15 +181,15 @@ $(document).ready(function() {
             type: 'POST',
             data: {
                 'current_index': currentIndex,
-                'is_correct': isCorrect,
+                // 'is_correct': isCorrect,
                 'csrfmiddlewaretoken': $('input[name="csrfmiddlewaretoken"]').val(),
             },
             success: function(response) {
                 if (response.error) {
                     window.location.href = allTasksUrl // в случае ошибки перенаправляем на страницу со всеми заданиями
                 } else {
-                    $('#column1').text(response.column1) // получаем английское предложение с бекенда
-                    $('#column2').text(response.column2) // получаем украинское предложение с бекенда
+                    $('#column1').text(response.english_sentence) // получаем английское предложение с бекенда
+                    $('#column2').text(response.ukrainian_sentence) // получаем украинское предложение с бекенда
                     currentIndex = response.next_index // получаем с бекенда индекс следующего предложения
                     taskData.data('current-index', currentIndex) // меняем предложение на странице после проверки на его правильность
 
@@ -200,8 +198,8 @@ $(document).ready(function() {
 
                     isFirstSentence = false
                     
-                    let words = response.column1.split(" ") // получаем предложение, которое нужно собрать
-                    let randomWords = response.random_words // получаем рандомные слова для заполнения пустых кнопок ими
+                    let words = response.english_sentence.split(" ") // получаем предложение, которое нужно собрать
+                    let randomWords = response.additional_words // получаем рандомные слова для заполнения пустых кнопок ими
 
                     // получение требуемых слов из английского предложения
                     allSentenceWords = words.slice(0, 9)
