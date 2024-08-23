@@ -5,23 +5,23 @@ from django.urls import reverse
 from .models import *
 from auth_reg.models import *
 import pandas
-import json
 
 # Create your views here.
 def main_view(request):
     context = {}
-    # если пользователь авторизован
+    
     if request.user.is_authenticated:
         context['username'] = request.user.username
         context['signed_in'] = True
         
     return render(request, 'course/main.html', context)
 
-# для страницы курса со всеми заданиями
+# Для страницы курса со всеми уроками и заданиями
 def course_view(request):
     context = {}
-    sentences_dict_list = []
     
+    # Проверка статуса пользователя, и дальнейшее указание того
+    # какой контент должен быть на странице
     try:
         user_status = UserProfile.objects.get(user=request.user)
         
@@ -31,13 +31,12 @@ def course_view(request):
             context['user_status'] = 'student'
     except UserProfile.DoesNotExist: pass
         
-    # если пользователь авторизован
     if request.user.is_authenticated:
         context['username'] = request.user.username
         context['signed_in'] = True
         
     if request.method == 'POST':
-        # если добавляем задание
+        # Если от ajax-а пришло что пользователь добавляет задание
         if 'add_task' in request.POST:
             task_name = request.POST.get('taskname')
             task_file = request.FILES.get('taskfile')
@@ -81,14 +80,23 @@ def course_view(request):
 
                 for row in additional_words.itertuples(index=False):
                     word_value = row[0]
-                    lines_word = [line.strip() for line in word_value.strip().split('\n') if line.strip()]
                     
-                    if lines_word:
-                        additional_words_list.extend(lines_word)
+                    cleaned_word_value = word_value.strip()
+                    lines_words = cleaned_word_value.split('\n')
+                    
+                    lines_word_final = []
+                    
+                    for line in lines_words:
+                        stripped_line = line.strip()
+                        if stripped_line:
+                            lines_word_final.append(stripped_line)
+                    
+                    if lines_word_final:
+                        additional_words_list.extend(lines_word_final)
 
                 # print(english_sentences)
-                # print(ukrainian_sentences)
-                # print(additional_words_list)
+                print(ukrainian_sentences)
+                print(additional_words_list)
                 
                 selected_lesson = Lesson.objects.get(id=selected_lesson_value)
                 
@@ -116,15 +124,14 @@ def course_view(request):
             else:
                 return JsonResponse({'error': 'Заповніть усі поля'})
         
-        # если удаляем задание
         if 'delete_task' in request.POST:
-            # узначем, какое задание надо удалять
+            # Получаем из ajax id задания которое нужно удалить
             task_id = request.POST.get('task_id')
             try:
-                # получаем его из бд и удаляем на стороне сервера
+                # Получаем его из бд и удаляем на стороне сервера
                 task = UserProgress.objects.get(id=task_id)
                 task.delete()
-                # отправляем ajax-у, что можно удалять задание на стороне клиента
+                # Отправляем ajax-у, что можно удалять задание на стороне клиента
                 return JsonResponse({'deleteTask': True})
             # на крайняк, если задания каким-то образом не будет
             except UserProgress.DoesNotExist:
@@ -177,7 +184,7 @@ def course_view(request):
 # Для страницы каждого задания
 def task_detail_view(request, task_id):
     context = {}
-    # если пользователь авторизован
+    
     if request.user.is_authenticated:
         context['username'] = request.user.username
         context['signed_in'] = True
@@ -189,9 +196,10 @@ def task_detail_view(request, task_id):
     additional_words = task.additional_words
     
     if request.method == 'POST':
-        # Получаем задание на котором находимся
+        # Получаем задание на котором находимся из ajax
         current_index = int(request.POST.get('current_index', 0))
 
+        # Если не достигли конца списка предложений, передаем индекс следующего предложения
         if current_index < len(english_sentences) - 1:
             next_english_sentence = english_sentences[current_index + 1]
             next_ukrainian_sentence = ukrainian_sentences[current_index + 1]
@@ -207,14 +215,14 @@ def task_detail_view(request, task_id):
 
         return JsonResponse(response_data)
 
-    # получаем первое предложение
+    # Получаем первое предложение в задании
     first_english_sentence = english_sentences[0]
     first_ukrainian_sentence = ukrainian_sentences[0]
-    context['task'] = task  # передаем конкретное задание, на котором находимся через контекст
-    context['first_english_sentence'] = first_english_sentence  # передаем первое предложение на английском через контекст
-    context['first_ukrainian_sentence'] = first_ukrainian_sentence  # передаем первое предложение на украинском через контекст
-    context['sentences_len'] = range(1, len(english_sentences) + 1)  # передаем количество предложений через контекст
-    context['additional_words_first'] = additional_words  # передаем дополнительные слова через контекст
+    context['task'] = task
+    context['first_english_sentence'] = first_english_sentence  # Передаем первое предложение на английском
+    context['first_ukrainian_sentence'] = first_ukrainian_sentence  # Передаем первое предложение на украинском
+    context['sentences_len'] = range(1, len(english_sentences) + 1)  # Передаем количество предложений
+    context['additional_words_first'] = additional_words  # Передаем дополнительные слова для первого предложения
     
     # context['task_after_restart'] = user_progress.current_index
     

@@ -5,25 +5,22 @@ from django.db.utils import IntegrityError
 from auth_reg.models import *
 
 # Create your views here.
-# функция обработки авторизации
+# Функция обработки авторизации
 def auth_view(request):
     context = {}
     
-    # если пользователь авторизован
     if request.user.is_authenticated:
         context['username'] = request.user.username
         context['signed_in'] = True
     
-    # если пользователь нажал кнопку входа
     if 'submit_btn' in request.POST:
-        # проверка, если пользователь уже вошел в аккаунт при попытке входа
+        # Проверка, если пользователь уже вошел в аккаунт при попытке входа
         if request.user.is_authenticated:
             context['error'] = 'Вы уже вошли в аккаунт'
         else:
             username = request.POST.get('username_inp')
             password = request.POST.get('password_inp')
             
-            # проверка заполнения полей
             if username and password:
                 user = authenticate(username=username, password=password)
                 
@@ -34,40 +31,35 @@ def auth_view(request):
                     context["error_message"] = 'Логін або пароль не вірні'
             else:
                 context['error_message'] = 'Заповніть усі поля'
-    # если пользователь нажал кнопку выхода
     if 'leave_btn' in request.POST:
         logout(request)
         return redirect('auth')
     return render(request, 'auth_reg/auth.html', context)
 
-# функция обработки регистрации
+# Функция обработки регистрации
 def reg_view(request):
     context = {}
     
-    # если пользователь авторизован
     if request.user.is_authenticated:
         context['username'] = request.user.username
         context['signed_in'] = True
         
-    # если пользователь нажал кнопку регистрации
     if request.method == 'POST':
         username = request.POST.get('username_inp')
         password = request.POST.get('password_inp')
         confirm_password = request.POST.get('conf_password_inp')
     
-    
-        # проверка заполнения полей
         if username and password and confirm_password:
             if password == confirm_password:
-                # проверка наличия такого пользователя
+                # Проверка наличия такого пользователя
                 try:
-                    # создание пользователя
+                    # Создание пользователя
                     user = User.objects.create_user(
                         username=username,
                         password=password,
                     )
                     
-                    # создание профиля пользователя
+                    # Создание профиля пользователя
                     UserProfile.objects.create(user=user)
                     
                     return redirect('auth')

@@ -59,14 +59,13 @@ $(document).ready(function() {
     })
 
     $('#addnameform').submit(function(event) {
-        // не даем форме сразу отправиться
         event.preventDefault()
 
         selectedLesson = document.querySelector('#dropdown-lessons')
         
-        // создаем formData чтобы можно было отправлять файлы из формы через ajax
+        // Создаем formData чтобы можно было отправлять файлы из формы через ajax
         var formData = new FormData()
-        // добавляем в formData csrf_token и значения из формы, чтобы переправить их на бекенд
+        // Добавляем в formData csrf_token и значения из формы, чтобы переправить их на бекенд
         formData.append('csrfmiddlewaretoken', $('input[name=csrfmiddlewaretoken]').val())
         formData.append('taskname', $('input[name=taskname]').val())
         formData.append('taskfile', $('input[name=taskfile]')[0].files[0])
@@ -92,19 +91,18 @@ $(document).ready(function() {
                     lessonBlock.find('.lesson-tasks').append(response.task_html)
                 }
                 if (response.error) {
-                    // вывод ошибок пользователя при создании задания
                     $('#error-message').text(response.error)
                 }
             },
         })
     });
 
-    // обрабатываем удаление задания через ajax
+    // Обрабатываем удаление задания
     $('.lessons').on('submit', '.delete-task-form', function(event) {
         event.preventDefault()
 
-        var $form = $(this) // получаем нашу форму
-        // получаем конкретное задания, которое хотим удалить
+        var $form = $(this)
+        // Получаем задание, которое хотим удалить
         var taskId = $form.find('input[name=task_id]').val()
 
         $.ajax({
@@ -117,10 +115,10 @@ $(document).ready(function() {
             },
             success: function(response) {
                 if (response.deleteTask) {
-                    // после удаления на сервере удаляем со страницы
+                    // После удаления на сервере удаляем со страницы
                     $form.closest('.course-block').remove()
                 } else {
-                    // на случай ошибки при удалении, по типу если удаляемое не найдено (их нет)
+                    // На случай ошибки при удалении, по типу если удаляемое задание не найдено
                     alert('Ошибка при удалении задачи: ' + response.error)
                 }
             }
