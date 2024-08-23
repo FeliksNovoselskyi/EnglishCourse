@@ -8,6 +8,7 @@
         <form method="post" class="delete-task-form" action="">
             {% csrf_token %}
             <input type="hidden" name="task_id" value="{{task.id}}">
+            <input type="hidden" name="lesson_id" value="{{lesson_id}}">
             <button type="submit" name="delete_task" class="delete-task-btn">
                 <img src="{% static 'images/delete.png' %}" alt="change-task-img" class="small-course-imgs">
             </button>

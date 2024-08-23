@@ -29,7 +29,7 @@ $(document).ready(function() {
         })
     })
 
-    $('.lessons').on('submit', '.delete-lesson-form', function(event) {
+    $('.lessons').on('submit', '#delete-lesson-formid', function(event) {
         event.preventDefault()
 
         var $form = $(this)
@@ -89,8 +89,9 @@ $(document).ready(function() {
                     })
     
                     lessonBlock.find('.lesson-tasks').append(response.task_html)
-                }
-                if (response.error) {
+                } if (response.canDeleteLesson === false) {
+                    $('#delete-button-' + selectedLesson.value).remove()
+                } if (response.error) {
                     $('#error-message').text(response.error)
                 }
             },
@@ -104,6 +105,7 @@ $(document).ready(function() {
         var $form = $(this)
         // Получаем задание, которое хотим удалить
         var taskId = $form.find('input[name=task_id]').val()
+        var lessonId = $form.find('input[name=lesson_id]').val()
 
         $.ajax({
             url: '/course/',
@@ -111,12 +113,21 @@ $(document).ready(function() {
             data: {
                 csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
                 task_id: taskId,
+                lesson_id: lessonId,
                 delete_task: true
             },
             success: function(response) {
                 if (response.deleteTask) {
                     // После удаления на сервере удаляем со страницы
                     $form.closest('.course-block').remove()
+
+                    if (response.canDeleteLesson) {
+                        $('.delete-lesson-form-' + lessonId).append(`
+                            <button type="submit" name="delete_lesson" class="delete-lesson-btn" id="delete-button-${lessonId}">
+                                <img src="/static/images/delete.png" alt="delete-lesson-img" class="delete-lessons-icon">
+                            </button>
+                        `)
+                    }
                 } else {
                     // На случай ошибки при удалении, по типу если удаляемое задание не найдено
                     alert('Ошибка при удалении задачи: ' + response.error)

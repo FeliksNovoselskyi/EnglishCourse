@@ -20,10 +20,12 @@
                 <div class="lessons-from-backend">
                     <div class="lesson-head">
                         <h4 class="lesson-name">{{lesson_with_tasks.lesson.lesson_name}}</h3>
-                        <form method="post" class="delete-lesson-form" action="">
+                        <form method="post" class="delete-lesson-form-{{lesson_with_tasks.lesson.id}}" id="delete-lesson-formid" action="">
                             {% csrf_token %}
                             <input type="hidden" name="lesson_id" value="{{lesson_with_tasks.lesson.id}}">
-                            <button type="submit" name="delete_lesson" class="delete-lesson-btn"><img src="{% static 'images/delete.png' %}" alt="delete-lesson-img" class="delete-lessons-icon"></button>
+                            {% if lesson_with_tasks.lesson.can_delete == 1 %}
+                                <button type="submit" name="delete_lesson" class="delete-lesson-btn" id="delete-button-{{lesson_with_tasks.lesson.id}}"><img src="{% static 'images/delete.png' %}" alt="delete-lesson-img" class="delete-lessons-icon"></button>
+                            {% endif %}
                         </form>
                     </div>
 
@@ -37,6 +39,7 @@
                                     <form method="post" class="delete-task-form" action="">
                                         {% csrf_token %}
                                         <input type="hidden" name="task_id" value="{{task.id}}">
+                                        <input type="hidden" name="lesson_id" value="{{lesson_with_tasks.lesson.id}}">
                                         <button type="submit" name="delete_task" class="delete-task-btn">
                                             <img src="{% static 'images/delete.png' %}" alt="change-task-img" class="small-course-imgs">
                                         </button>

@@ -2,10 +2,10 @@
 <div class="lessons-from-backend">
     <div class="lesson-head">
         <h4 class="lesson-name">{{lesson.lesson_name}}</h3>
-        <form method="post" class="delete-lesson-form" action="">
+        <form method="post" class="delete-lesson-form-{{lesson.id}}" id="delete-lesson-formid" action="">
             {% csrf_token %}
             <input type="hidden" name="lesson_id" value="{{lesson.id}}">
-            <button type="submit" name="delete_lesson" class="delete-lesson-btn"><img src="{% static 'images/delete.png' %}" alt="delete-lesson-img" class="delete-lessons-icon"></button>
+            <button type="submit" name="delete_lesson" class="delete-lesson-btn" id="delete-button-{{lesson.id}}"><img src="{% static 'images/delete.png' %}" alt="delete-lesson-img" class="delete-lessons-icon"></button>
         </form>
     </div>
 

@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 # Create your models here.
 class Lesson(models.Model):
     lesson_name = models.CharField(max_length=255, blank=True, null=True)
+    can_delete = models.BooleanField(default=True)
     
 class UserProgress(models.Model):
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
