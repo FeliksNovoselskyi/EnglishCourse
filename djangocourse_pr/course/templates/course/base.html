@@ -19,7 +19,9 @@
     <header>
         <div id="links">
             <a class='header-links' href="{% url 'main' %}">Головна</a>
-            <a class='header-links' href="{% url 'course' %}">Курс</a>
+            {% if signed_in %}
+                <a class='header-links' href="{% url 'course' %}">Курс</a>
+            {% endif %}
         </div>
 
         {% if signed_in %}
