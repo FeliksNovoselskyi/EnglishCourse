@@ -78,9 +78,14 @@ $(document).ready(function() {
         }
 
         allWords = shuffleArray(allWords)
-        allWords = allWords.toString()
-        allWords = allWords.toLowerCase()
-        allWords = allWords.split(',')
+        allWords = allWords.toString().toLowerCase().split(',')
+
+        // Проверка и замена дублирующихся слов
+        for (let i = 0; i < allWords.length; i++) {
+            while (allWords.indexOf(allWords[i]) !== i) {
+                allWords[i] = randomWordsArg.shift() // Заменяем повторяющееся слова на новое
+            }
+        }
 
         updateButtons(allWords)
     }
