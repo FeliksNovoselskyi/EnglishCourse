@@ -108,16 +108,16 @@
     <div class="modal fade" id="TaskDeletingConfirmModal" tabindex="-1" aria-labelledby="TaskDeletingConfirmModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
           <div class="modal-content">
-            <div class="modal-header">
+            <div class="modal-header deleting-confirm">
+                <p>Ви дійсно хочете видалити це завдання?</p>
+
                 <div class="delete-task-confirm">
                     <form action="" method="post" id="deleteconfirmform">
                         {% csrf_token %}
 
-                        <p>Ви дійсно хочете видалити це завдання?</p>
-
-                        <input type="submit" value="Так" name="delete_confirm" id="delete_confirm" data-bs-dismiss="modal">
+                        <input type="submit" value="Так" name="delete-confirm" id="delete-confirm" data-bs-dismiss="modal">
                     </form>
-                    <button data-bs-dismiss="modal" id="delete_unconfirm">Ні</button>
+                    <button data-bs-dismiss="modal" id="delete-unconfirm">Ні</button>
                 </div> 
             </div>
           </div>
