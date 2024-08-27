@@ -9,7 +9,10 @@ $(document).ready(function() {
     const randomWordsFirstSentence = $('#randomwords_first') // Случайные слова для первого предложения
     const changeFinalSentence = document.querySelector('.final-sentence') // Собираемое предложение
     const finalSentencePlace = document.querySelector('.final-sentence-place') // Блок с подчеркиванием собираемого предложения
-    
+    // Получаем кнопку удаления слов чтобы скрывать её
+    // в случае если слов нет, и наоборот
+    const undoBtn = document.querySelector('.undo-btn')
+
     // Флаги
     let formSubmittedFlag = false
     let updateSentenceFlag = true
@@ -145,6 +148,14 @@ $(document).ready(function() {
 
     // Функция проверки предложения
     function checkSentenceByInterval() {
+        if (finalSentence.text() == '') {
+            undoBtn.style.display = 'none'
+            undoBtn.style.visibility = 'hidden'
+        } else {
+            undoBtn.style.display = 'flex'
+            undoBtn.style.visibility = 'visible'
+        }
+        
         // Проверяем отправляется ли форма
         // в ином случае проверка заданий будет работать не корректно, и задание будет проходится автоматически
         if (formSubmittedFlag) return
@@ -182,8 +193,8 @@ $(document).ready(function() {
         }
     }
 
-    // Проверяем собираемое предложение каждый 100 миллисекунд
-    setInterval(checkSentenceByInterval, 100)
+    // Проверяем собираемое предложение каждый 50 миллисекунд
+    setInterval(checkSentenceByInterval, 50)
     
     $('#nexttaskform').submit(function(event) {
         let isCorrect = changeFinalSentence.style.color === 'orange' ? 1 : 0;

@@ -259,6 +259,8 @@
 }
 
 .undo-btn {
+    display: none;
+    visibility: hidden;
     background-color: transparent;
     border: transparent;
     border-radius: 16px;
