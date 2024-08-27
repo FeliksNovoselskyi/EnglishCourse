@@ -40,7 +40,7 @@
                                         {% csrf_token %}
                                         <input type="hidden" name="task_id" value="{{task.id}}">
                                         <input type="hidden" name="lesson_id" value="{{lesson_with_tasks.lesson.id}}">
-                                        <button type="submit" name="delete_task" class="delete-task-btn">
+                                        <button type="submit" name="delete_task" class="delete-task-btn" data-bs-toggle="modal" data-bs-target="#TaskDeletingConfirmModal">
                                             <img src="{% static 'images/delete.png' %}" alt="change-task-img" class="small-course-imgs">
                                         </button>
                                     </form>
@@ -100,6 +100,25 @@
                     </form>
                 </div>
               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+          </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="TaskDeletingConfirmModal" tabindex="-1" aria-labelledby="TaskDeletingConfirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <div class="modal-content">
+            <div class="modal-header">
+                <div class="delete-task-confirm">
+                    <form action="" method="post" id="deleteconfirmform">
+                        {% csrf_token %}
+
+                        <p>Ви дійсно хочете видалити це завдання?</p>
+
+                        <input type="submit" value="Так" name="delete_confirm" id="delete_confirm" data-bs-dismiss="modal">
+                    </form>
+                    <button data-bs-dismiss="modal" id="delete_unconfirm">Ні</button>
+                </div> 
             </div>
           </div>
         </div>

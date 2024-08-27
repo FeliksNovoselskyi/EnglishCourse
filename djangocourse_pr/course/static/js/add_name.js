@@ -1,5 +1,7 @@
 
 $(document).ready(function() {
+    let isConfirmDelete = false
+
     $('#addlessonform').submit(function(event) {
         event.preventDefault()
 
@@ -107,32 +109,38 @@ $(document).ready(function() {
         var taskId = $form.find('input[name=task_id]').val()
         var lessonId = $form.find('input[name=lesson_id]').val()
 
-        $.ajax({
-            url: '/course/',
-            type: 'POST',
-            data: {
-                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
-                task_id: taskId,
-                lesson_id: lessonId,
-                delete_task: true
-            },
-            success: function(response) {
-                if (response.deleteTask) {
-                    // После удаления на сервере удаляем со страницы
-                    $form.closest('.course-block').remove()
+        $('#deleteconfirmform').off('submit').on('submit', function(event) {
+            event.preventDefault()
 
-                    if (response.canDeleteLesson) {
-                        $('.delete-lesson-form-' + lessonId).append(`
-                            <button type="submit" name="delete_lesson" class="delete-lesson-btn" id="delete-button-${lessonId}">
-                                <img src="/static/images/delete.png" alt="delete-lesson-img" class="delete-lessons-icon">
-                            </button>
-                        `)
+            console.log(taskId, lessonId)
+            
+            $.ajax({
+                url: '/course/',
+                type: 'POST',
+                data: {
+                    csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                    task_id: taskId,
+                    lesson_id: lessonId,
+                    delete_task: true
+                },
+                success: function(response) {
+                    if (response.deleteTask) {
+                        // После удаления на сервере удаляем со страницы
+                        $form.closest('.course-block').remove()
+    
+                        if (response.canDeleteLesson) {
+                            $('.delete-lesson-form-' + lessonId).append(`
+                                <button type="submit" name="delete_lesson" class="delete-lesson-btn" id="delete-button-${lessonId}">
+                                    <img src="/static/images/delete.png" alt="delete-lesson-img" class="delete-lessons-icon">
+                                </button>
+                            `)
+                        }
+                    } else {
+                        // На случай ошибки при удалении, по типу если удаляемое задание не найдено
+                        alert('Ошибка при удалении задачи: ' + response.error)
                     }
-                } else {
-                    // На случай ошибки при удалении, по типу если удаляемое задание не найдено
-                    alert('Ошибка при удалении задачи: ' + response.error)
                 }
-            }
-        });
+            });
+        })
     });
 })

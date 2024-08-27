@@ -150,6 +150,7 @@ def course_view(request):
         if 'delete_task' in request.POST:
             # Получаем из ajax id задания которое нужно удалить
             task_id = request.POST.get('task_id')
+            print(task_id)
             lesson_id = request.POST.get('lesson_id')
             
             try:
