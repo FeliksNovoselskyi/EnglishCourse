@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 class Lesson(models.Model):
     lesson_name = models.CharField(max_length=255, blank=True, null=True)
     can_delete = models.BooleanField(default=True)
+    order = models.PositiveIntegerField(default=0)
     
 class UserProgress(models.Model):
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)

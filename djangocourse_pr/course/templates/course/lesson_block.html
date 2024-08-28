@@ -1,5 +1,5 @@
 {% load static %}
-<div class="lessons-from-backend">
+<div class="lessons-from-backend" data-lesson-id="{{lesson.id}}">
     <div class="lesson-head">
         <h4 class="lesson-name">{{lesson.lesson_name}}</h3>
         <form method="post" class="delete-lesson-form-{{lesson.id}}" id="delete-lesson-formid" action="">

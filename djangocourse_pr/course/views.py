@@ -5,6 +5,7 @@ from django.urls import reverse
 from .models import *
 from auth_reg.models import *
 import pandas
+import json
 
 # Create your views here.
 def main_view(request):
@@ -56,6 +57,17 @@ def course_view(request):
         context['signed_in'] = True
         
     if request.method == 'POST':
+        if 'lesson_order' in request.POST:
+            try:
+                lesson_order = json.loads(request.POST['lesson_order'])
+                for lesson in lesson_order:
+                    lesson_id = lesson['id']
+                    order = lesson['order']
+                    Lesson.objects.filter(id=lesson_id).update(order=order)
+                return JsonResponse({'success': True})
+            except json.JSONDecodeError:
+                return JsonResponse({'success': False, 'error': 'Ошибка при передаче данных'})
+        
         # Если от ajax-а пришло что пользователь добавляет задание
         if 'add_task' in request.POST:
             task_name = request.POST.get('taskname')
@@ -150,7 +162,7 @@ def course_view(request):
         if 'delete_task' in request.POST:
             # Получаем из ajax id задания которое нужно удалить
             task_id = request.POST.get('task_id')
-            print(task_id)
+            # print(task_id)
             lesson_id = request.POST.get('lesson_id')
             
             try:
@@ -201,7 +213,7 @@ def course_view(request):
             except Lesson.DoesNotExist:
                 return JsonResponse({'success': False, 'error': 'Урок не знайдений'})
             
-    all_lessons = Lesson.objects.all()
+    all_lessons = Lesson.objects.all().order_by('order')
     lessons_with_tasks = []
     
     for lesson in all_lessons:

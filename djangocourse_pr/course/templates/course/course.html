@@ -3,6 +3,8 @@
 
 {% block links %}
     <link rel="stylesheet" href="{% static 'css/course.css' %}">
+    <script src="{% static 'js/sortable.js' %}" defer></script>
+    <meta name="csrf-token" content="{{csrf_token}}">
 {% endblock %}
 
 {% block content %}
@@ -17,7 +19,7 @@
 
         <div class="lessons">
             {% for lesson_with_tasks in lessons_with_tasks %}
-                <div class="lessons-from-backend">
+                <div class="lessons-from-backend" data-lesson-id="{{lesson_with_tasks.lesson.id}}">
                     <div class="lesson-head">
                         <h4 class="lesson-name">{{lesson_with_tasks.lesson.lesson_name}}</h3>
                         <form method="post" class="delete-lesson-form-{{lesson_with_tasks.lesson.id}}" id="delete-lesson-formid" action="">
