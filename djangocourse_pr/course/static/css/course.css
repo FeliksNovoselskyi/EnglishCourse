@@ -5,6 +5,21 @@
     gap: 20px;
 }
 
+
+#modules-list {
+    display: flex;
+    flex-direction: column;
+    background-color: #ebebeb;
+    border: 3px solid black;
+    border-radius: 16px;
+    padding: 20px;
+}
+
+.all-course-block {
+    display: flex;
+    flex-direction: row;
+}
+
 .adding-block {
     display: flex;
     flex-direction: row;
@@ -297,4 +312,11 @@
 
 #delete-unconfirm:hover {
     background-color: rgb(226, 226, 226);
+}
+
+.module-block {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
 }

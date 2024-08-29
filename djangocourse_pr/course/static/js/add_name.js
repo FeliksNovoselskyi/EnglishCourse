@@ -1,13 +1,71 @@
 
 $(document).ready(function() {
-    let isConfirmDelete = false
+    $('#addmoduleform').submit(function(event) {
+        event.preventDefault()
+
+        var $form = $(this)
+        var moduleName = $('input[name=modulename]').val()
+        var courseId = $('select[name=course_id]').val()
+        
+        $.ajax({
+            url: '/course/',
+            type: 'POST',
+            data: {
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                add_module: true,
+                modulename: moduleName,
+                course_id: courseId,
+            },
+            success: function(response) {
+                if (response.error) {
+                    $('#error-message-module').text(response.error)
+                } else if (response.addModule) {
+                    $('#modules-list').append(response.module_html)
+                    $('#dropdown-modules').append(`
+                        <option value="${response.moduleId}">${response.moduleName}</option>
+                    `)
+                }
+            }
+        })
+    })
+
+    $('#modules-list').on('submit', '#delete-module-form', function(event) {
+        event.preventDefault()
+        
+        var $form = $(this)
+        var moduleId = $form.find('input[name=module_id]').val()
+        
+        console.log(moduleId)
+        $.ajax({
+            url: '/course/',
+            type: 'POST',
+            data: {
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                module_id: moduleId,
+                delete_module: true
+            },
+            success: function(response) {
+                if (response.deleteModule) {
+                    $form.closest('.module-block').remove()
+
+                    var $optionToRemove = $('#dropdown-modules').find(`option[value="${moduleId}"]`)
+                    if ($optionToRemove.length) {
+                        $optionToRemove.remove()
+                    }
+                } else {
+                    alert('Помилка при видаленні модулю: ' + response.error)
+                }
+            },
+        })
+    })
+
 
     $('#addlessonform').submit(function(event) {
         event.preventDefault()
 
         var $form = $(this)
-        var lessonId = $form.find('input[name=lesson_id]').val()
         var lessonName = $('input[name=lessonname]').val()
+        var moduleId = $form.find('select[name=module_id]').val()
         
         $.ajax({
             url: '/course/',
@@ -16,7 +74,7 @@ $(document).ready(function() {
                 csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
                 add_lesson: true,
                 lessonname: lessonName,
-                lesson_id: lessonId,
+                module_id: moduleId,
             },
             success: function(response) {
                 if (response.error) {

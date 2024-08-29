@@ -185,10 +185,15 @@ def course_view(request):
             
         if 'add_lesson' in request.POST:
             lesson_name = request.POST.get('lessonname')
-            lesson_id = request.POST.get('lesson_id')
+            module_id = request.POST.get('module_id')
             
-            if lesson_name:
-                lesson = Lesson.objects.create(lesson_name=lesson_name)
+            if lesson_name and module_id:
+                try:
+                    module = Module.objects.get(id=module_id)
+                except Module.DoesNotExist:
+                    return JsonResponse({'error': 'Выбранный модуль не существует'})
+                
+                lesson = Lesson.objects.create(lesson_name=lesson_name, module=module)
                 lesson_id = lesson.id
                 
                 lesson_html = render_to_string('course/lesson_block.html', {
@@ -212,6 +217,37 @@ def course_view(request):
                 return JsonResponse({'deleteLesson': True})
             except Lesson.DoesNotExist:
                 return JsonResponse({'success': False, 'error': 'Урок не знайдений'})
+        
+        if 'add_module' in request.POST:
+            module_name = request.POST.get('modulename')
+            course_id = request.POST.get('course_id')
+            
+            if module_name and course_id:
+                course = Course.objects.get(id=course_id)
+                module = Module.objects.create(course=course, module_name=module_name)
+                module_id = module.id
+                
+                module_html = render_to_string('course/module_block.html', {
+                    'module': module
+                }, request=request)
+                
+                return JsonResponse({
+                    'addModule': True,
+                    'moduleId': module_id,
+                    'moduleName': module_name,
+                    'module_html': module_html,
+                })
+            else:
+                return JsonResponse({'error': 'Заповніть поле з назвою модулю'})
+        if 'delete_module' in request.POST:
+            module_id = request.POST.get('module_id')
+            
+            try:
+                module = Module.objects.get(id=module_id)
+                module.delete()
+                return JsonResponse({'deleteModule': True})
+            except Module.DoesNotExist:
+                return JsonResponse({'success': False, 'error': 'Модуль не знайдений'})
             
     all_lessons = Lesson.objects.all().order_by('order')
     lessons_with_tasks = []
@@ -222,6 +258,11 @@ def course_view(request):
             'lesson': lesson,
             'tasks': tasks,
         })
+        
+    courses = Course.objects.all()
+    modules = Module.objects.all()
+    context['courses'] = courses
+    context['modules'] = modules
     
     context['lessons_with_tasks'] = lessons_with_tasks
     

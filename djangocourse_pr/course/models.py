@@ -2,7 +2,17 @@ from django.db import models
 from django.contrib.auth.models import User
 
 # Create your models here.
+class Course(models.Model):
+    course_name = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+    
+class Module(models.Model):
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='modules')
+    module_name = models.CharField(max_length=255)
+    order = models.PositiveIntegerField(default=0)  
+
 class Lesson(models.Model):
+    module = models.ForeignKey(Module, on_delete=models.CASCADE, related_name='lessons')
     lesson_name = models.CharField(max_length=255, blank=True, null=True)
     can_delete = models.BooleanField(default=True)
     order = models.PositiveIntegerField(default=0)

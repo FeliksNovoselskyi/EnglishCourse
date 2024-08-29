@@ -9,120 +9,172 @@
 
 {% block content %}
     <h1>Курси</h1>
-    <div id="courses">
-        {% if user_status == 'teacher' %}
-            <div class="adding-block">
-                <button type="button" class="courses-buttons" data-bs-toggle="modal" data-bs-target="#exampleLessonModal"><p class="course-text">Створити урок</p></button>
-                <button type="button" class="courses-buttons" data-bs-toggle="modal" data-bs-target="#exampleModal"><p class="course-text">Додати завдання</p></button>
-            </div>
-        {% endif %}
-
-        <div class="lessons">
-            {% for lesson_with_tasks in lessons_with_tasks %}
-                <div class="lessons-from-backend" data-lesson-id="{{lesson_with_tasks.lesson.id}}">
-                    <div class="lesson-head">
-                        <h4 class="lesson-name">{{lesson_with_tasks.lesson.lesson_name}}</h3>
-                        <form method="post" class="delete-lesson-form-{{lesson_with_tasks.lesson.id}}" id="delete-lesson-formid" action="">
-                            {% csrf_token %}
-                            <input type="hidden" name="lesson_id" value="{{lesson_with_tasks.lesson.id}}">
-                            {% if lesson_with_tasks.lesson.can_delete == 1 %}
-                                <button type="submit" name="delete_lesson" class="delete-lesson-btn" id="delete-button-{{lesson_with_tasks.lesson.id}}"><img src="{% static 'images/delete.png' %}" alt="delete-lesson-img" class="delete-lessons-icon"></button>
-                            {% endif %}
-                        </form>
-                    </div>
-
-                    <div class="lesson-tasks" data-lesson-id="{{lesson_with_tasks.lesson.id}}">
-                        {% for task in lesson_with_tasks.tasks %}
-                            <div class="course-block">
-                                <div class="course-icon-block clickable-task" data-task-url="{% url 'task_detail' task.id %}">
-                                    <img src="{% static 'images/finished.png' %}" alt="finished-img" class="course-imgs">
-                                </div>
-                                <div class="task-change-icons">
-                                    <form method="post" class="delete-task-form" action="">
-                                        {% csrf_token %}
-                                        <input type="hidden" name="task_id" value="{{task.id}}">
-                                        <input type="hidden" name="lesson_id" value="{{lesson_with_tasks.lesson.id}}">
-                                        <button type="submit" name="delete_task" class="delete-task-btn" data-bs-toggle="modal" data-bs-target="#TaskDeletingConfirmModal">
-                                            <img src="{% static 'images/delete.png' %}" alt="change-task-img" class="small-course-imgs">
-                                        </button>
-                                    </form>
-                                </div>
-                                <div class="task-name-popup" data-task-url="{% url 'task_detail' task.id %}">{{task.task_name}}</div>
-                            </div>
-                        {% endfor %}
-                    </div>
+    <div class="all-course-block">
+        <div id="modules-list">
+            {% for module in modules %}
+                <div class="module-block">
+                    <h3 class="module-name" data-module-id="{{module.id}}">{{module.module_name}}</h3>
+                    <form method="post" id="delete-module-form" action="">
+                        {% csrf_token %}
+                        <input type="hidden" name="module_id" value="{{module.id}}">
+                        <button type="submit" name="delete_module" class="delete-lesson-btn" id="delete-button-{{module.id}}"><img src="{% static 'images/delete.png' %}" alt="delete-module-img" class="delete-lessons-icon"></button>
+                    </form>
                 </div>
             {% endfor %}
         </div>
-    </div>
 
-    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content">
-            <div class="modal-header">
-                <div class="add-change-task-name">
-                    <form action="" method="post" id="addnameform" enctype="multipart/form-data">
-                        {% csrf_token %}
-                        <select id="dropdown-lessons" name="dropdown-lessons">
-                            {% for lesson_with_tasks in lessons_with_tasks %}
-                                <option value="{{lesson_with_tasks.lesson.id}}">{{lesson_with_tasks.lesson.lesson_name}}</option>
+        <div id="courses">
+            {% if user_status == 'teacher' %}
+                <div class="adding-block">
+                    <button type="button" class="courses-buttons" data-bs-toggle="modal" data-bs-target="#exampleModuleModal"><p class="course-text">Створити модуль</p></button>
+                    <button type="button" class="courses-buttons" data-bs-toggle="modal" data-bs-target="#exampleLessonModal"><p class="course-text">Створити урок</p></button>
+                    <button type="button" class="courses-buttons" data-bs-toggle="modal" data-bs-target="#exampleModal"><p class="course-text">Додати завдання</p></button>
+                </div>
+            {% endif %}
+
+            <div class="lessons">
+                {% for lesson_with_tasks in lessons_with_tasks %}
+                    <div class="lessons-from-backend" data-lesson-id="{{lesson_with_tasks.lesson.id}}">
+                        <div class="lesson-head">
+                            <h4 class="lesson-name">{{lesson_with_tasks.lesson.lesson_name}}</h3>
+                            <form method="post" class="delete-lesson-form-{{lesson_with_tasks.lesson.id}}" id="delete-lesson-formid" action="">
+                                {% csrf_token %}
+                                <input type="hidden" name="lesson_id" value="{{lesson_with_tasks.lesson.id}}">
+                                {% if lesson_with_tasks.lesson.can_delete == 1 %}
+                                    <button type="submit" name="delete_lesson" class="delete-lesson-btn" id="delete-button-{{lesson_with_tasks.lesson.id}}"><img src="{% static 'images/delete.png' %}" alt="delete-lesson-img" class="delete-lessons-icon"></button>
+                                {% endif %}
+                            </form>
+                        </div>
+
+                        <div class="lesson-tasks" data-lesson-id="{{lesson_with_tasks.lesson.id}}">
+                            {% for task in lesson_with_tasks.tasks %}
+                                <div class="course-block">
+                                    <div class="course-icon-block clickable-task" data-task-url="{% url 'task_detail' task.id %}">
+                                        <img src="{% static 'images/finished.png' %}" alt="finished-img" class="course-imgs">
+                                    </div>
+                                    <div class="task-change-icons">
+                                        <form method="post" class="delete-task-form" action="">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="task_id" value="{{task.id}}">
+                                            <input type="hidden" name="lesson_id" value="{{lesson_with_tasks.lesson.id}}">
+                                            <button type="submit" name="delete_task" class="delete-task-btn" data-bs-toggle="modal" data-bs-target="#TaskDeletingConfirmModal">
+                                                <img src="{% static 'images/delete.png' %}" alt="change-task-img" class="small-course-imgs">
+                                            </button>
+                                        </form>
+                                    </div>
+                                    <div class="task-name-popup" data-task-url="{% url 'task_detail' task.id %}">{{task.task_name}}</div>
+                                </div>
                             {% endfor %}
-                        </select>
-                        <p class="course-text">Додайте назву завданню:</p>
-                        <input type="text" maxlength="10" name="taskname">
-                        <p>Речення:</p>
-                        <input type="file" name="taskfile">
-                        <p>Додаткові слова:</p>
-                        <input type="file" name="additional_words_file">
-                        
-                        <p id="error-message"></p>
-
-                        <input type="submit" value="Створити" name="add_task">
-                    </form>
-                </div>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                    </div>
+                {% endfor %}
             </div>
-          </div>
         </div>
-    </div>
 
-    <div class="modal fade" id="exampleLessonModal" tabindex="-1" aria-labelledby="exampleLessonModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content">
-            <div class="modal-header">
-                <div class="add-change-lesson-name">
-                    <form action="" method="post" id="addlessonform">
-                        {% csrf_token %}
-                        <p class="course-text">Додайте назву уроку:</p>
-                        <input type="text" name="lessonname">
-                        
-                        <p id="error-message-lesson"></p>
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <div class="add-change-task-name">
+                            <form action="" method="post" id="addnameform" enctype="multipart/form-data">
+                                {% csrf_token %}
+                                <select id="dropdown-lessons" name="dropdown-lessons">
+                                    {% for lesson_with_tasks in lessons_with_tasks %}
+                                        <option value="{{lesson_with_tasks.lesson.id}}">{{lesson_with_tasks.lesson.lesson_name}}</option>
+                                    {% endfor %}
+                                </select>
+                                <p class="course-text">Додайте назву завданню:</p>
+                                <input type="text" maxlength="10" name="taskname">
+                                <p>Речення:</p>
+                                <input type="file" name="taskfile">
+                                <p>Додаткові слова:</p>
+                                <input type="file" name="additional_words_file">
+                                
+                                <p id="error-message"></p>
 
-                        <input type="submit" value="Створити" name="add_lesson">
-                    </form>
+                                <input type="submit" value="Створити" name="add_task">
+                            </form>
+                        </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
                 </div>
-              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-          </div>
         </div>
-    </div>
 
-    <div class="modal fade" id="TaskDeletingConfirmModal" tabindex="-1" aria-labelledby="TaskDeletingConfirmModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-          <div class="modal-content">
-            <div class="modal-header deleting-confirm">
-                <p>Ви дійсно хочете видалити це завдання?</p>
+        <div class="modal fade" id="exampleLessonModal" tabindex="-1" aria-labelledby="exampleLessonModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <div class="add-change-lesson-name">
+                            <form action="" method="post" id="addlessonform">
+                                {% csrf_token %}
+                                <p class="course-text">Виберіть модуль для уроку:</p>
+                                <select id="dropdown-modules" name="module_id">
+                                    {% for module in modules %}
+                                        <option value="{{module.id}}">{{module.module_name}}</option>
+                                    {% endfor %}
+                                </select>
 
-                <div class="delete-task-confirm">
-                    <form action="" method="post" id="deleteconfirmform">
-                        {% csrf_token %}
+                                <p class="course-text">Додайте назву уроку:</p>
+                                <input type="text" name="lessonname">
+                                
+                                <p id="error-message-lesson"></p>
 
-                        <input type="submit" value="Так" name="delete-confirm" id="delete-confirm" data-bs-dismiss="modal">
-                    </form>
-                    <button data-bs-dismiss="modal" id="delete-unconfirm">Ні</button>
-                </div> 
+                                <input type="submit" value="Створити" name="add_lesson">
+                            </form>
+                        </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                </div>
             </div>
-          </div>
+        </div>
+
+        <div class="modal fade" id="exampleModuleModal" tabindex="-1" aria-labelledby="exampleModuleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <div class="add-change-module-name">
+                            <form action="" method="post" id="addmoduleform">
+                                {% csrf_token %}
+                                <p class="course-text">Додайте назву модулю:</p>
+                                <input type="text" name="modulename">
+
+                                <p class="course-text">Виберіть курс:</p>
+                                <select name="course_id" required>
+                                    {% for course in courses %}
+                                        <option value="{{course.id}}">{{course.course_name}}</option>
+                                    {% endfor %}
+                                </select>
+
+                                
+                                <p id="error-message-module"></p>
+
+                                <input type="submit" value="Створити" name="add_module">
+                            </form>
+                        </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="TaskDeletingConfirmModal" tabindex="-1" aria-labelledby="TaskDeletingConfirmModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header deleting-confirm">
+                        <p>Ви дійсно хочете видалити це завдання?</p>
+
+                        <div class="delete-task-confirm">
+                            <form action="" method="post" id="deleteconfirmform">
+                                {% csrf_token %}
+
+                                <input type="submit" value="Так" name="delete-confirm" id="delete-confirm" data-bs-dismiss="modal">
+                            </form>
+                            <button data-bs-dismiss="modal" id="delete-unconfirm">Ні</button>
+                        </div> 
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 {% endblock %}
