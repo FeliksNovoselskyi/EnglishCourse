@@ -3,21 +3,31 @@
     align-items: flex-start;
     flex-direction: column;
     gap: 20px;
+    margin-bottom: 20px;
+    padding-left: 25vw;
 }
 
 
 #modules-list {
     display: flex;
     flex-direction: column;
+    align-items: center;
     background-color: #ebebeb;
     border: 3px solid black;
     border-radius: 16px;
     padding: 20px;
+    width: 25vw;
+    min-height: calc(100vh - 120px);
+    position: fixed;
+    top: 100px;
+    left: 10px;
+    box-sizing: border-box;
 }
 
 .all-course-block {
     display: flex;
     flex-direction: row;
+    gap: 20px;
 }
 
 .adding-block {
@@ -319,4 +329,9 @@
     flex-direction: row;
     align-items: center;
     gap: 10px;
+}
+
+.module-name {
+    font-size: 25px;
+    margin-top: 5px;
 }
