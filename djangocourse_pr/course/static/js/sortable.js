@@ -1,41 +1,51 @@
 $(document).ready(function () {
-    const $container = $('.lessons')
+    const $lessons = $('.lessons')
+    const $modules = $('#modules-list')
 
-    if ($container.length) {
-        new Sortable($container[0], {
-            animation: 150,
-            onEnd: function () {
-                const lessonOrder = []
+    const $userStatus = $('#user-status')
 
-                // Получаем все элементы уроков в контейнере
-                const $lessons = $container.children()
+    const forLesson = 'lesson-id'
+    const forModule = 'module-id'
 
-                // Перебираем каждый урок и сохраняем его id и порядок
-                $lessons.each(function (index) {
-                    const lessonId = $(this).data('lesson-id') // Получаем id урока из data атрибута
-                    lessonOrder.push({
-                        id: lessonId,
-                        order: index + 1 // плюсуем 1 чтобы порядок начинался с 1, а не с нуля 0
+    function sortableContainer(container, dataAttr, sortableObjType) {
+        if (container.length && $userStatus.val() == 'teacher') {
+            new Sortable(container[0], {
+                animation: 150,
+                onEnd: function () {
+                    const order = []
+    
+                    // Получаем все элементы в контейнере
+                    const containerCells = container.children()
+    
+                    // Перебираем каждый элемент контейнера и сохраняем его id и порядок
+                    containerCells.each(function (index) {
+                        const cellId = $(this).data(dataAttr) // Получаем id элемента из data атрибута
+                        order.push({
+                            id: cellId,
+                            order: index + 1 // плюсуем 1 чтобы порядок начинался с 1, а не с нуля
+                        })
                     })
-                })
-
-                // Получаем csrf из тега meta в шаблоне
-                const csrfToken = $('meta[name="csrf-token"]').attr('content')
-
-                $.ajax({
-                    type: 'POST',
-                    url: window.location.href,
-                    data: {
-                        csrfmiddlewaretoken: csrfToken,
-                        lesson_order: JSON.stringify(lessonOrder)
-                    },
-                    success: function (response) {
-                        console.log('свержение порядка среди уроков было успешно')
-                    },
-                })
-            }
-        })
-    } else {
-        console.log('уроков ещё нету')
+    
+                    // Получаем csrf из тега meta в шаблоне
+                    const csrfToken = $('meta[name="csrf-token"]').attr('content')
+    
+                    $.ajax({
+                        type: 'POST',
+                        url: window.location.href,
+                        data: {
+                            csrfmiddlewaretoken: csrfToken,
+                            cell_order: JSON.stringify(order),
+                            sortable_obj_type: sortableObjType,
+                        },
+                        success: function () {
+                            // console.log('свержение порядка среди уроков было успешно')
+                        },
+                    })
+                }
+            })
+        }
     }
+
+    sortableContainer($lessons, forLesson, 'lesson')
+    sortableContainer($modules, forModule, 'module')
 })

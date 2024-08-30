@@ -7,8 +7,7 @@
     padding-left: 25vw;
 }
 
-
-#modules-list {
+#coursehead {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -22,6 +21,18 @@
     top: 100px;
     left: 10px;
     box-sizing: border-box;
+}
+
+#modules-list {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+#coursehead h1 {
+    font-size: 32px;
+    font-weight: bold;
 }
 
 .all-course-block {
@@ -326,12 +337,15 @@
 
 .module-block {
     display: flex;
+    justify-content: space-between;
+    width: 100%;
     flex-direction: row;
     align-items: center;
+    border-bottom: 2px solid black;
     gap: 10px;
 }
 
 .module-name {
-    font-size: 25px;
+    font-size: 22.5px;
     margin-top: 5px;
 }

@@ -3,7 +3,6 @@ $(document).ready(function() {
     $('#addmoduleform').submit(function(event) {
         event.preventDefault()
 
-        var $form = $(this)
         var moduleName = $('input[name=modulename]').val()
         var courseId = $('select[name=course_id]').val()
         
@@ -35,27 +34,40 @@ $(document).ready(function() {
         var $form = $(this)
         var moduleId = $form.find('input[name=module_id]').val()
         
-        console.log(moduleId)
-        $.ajax({
-            url: '/course/',
-            type: 'POST',
-            data: {
-                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
-                module_id: moduleId,
-                delete_module: true
-            },
-            success: function(response) {
-                if (response.deleteModule) {
-                    $form.closest('.module-block').remove()
+        var moduleLessons = document.querySelectorAll(`#module-lesson-id-${moduleId}`)
+        var moduleTasks =  document.querySelectorAll(`#module-task-id-${moduleId}`)
 
-                    var $optionToRemove = $('#dropdown-modules').find(`option[value="${moduleId}"]`)
-                    if ($optionToRemove.length) {
-                        $optionToRemove.remove()
+        $('#delete-module-confirm-form').off('submit').on('submit', function(event) {
+            event.preventDefault()
+            
+            $.ajax({
+                url: '/course/',
+                type: 'POST',
+                data: {
+                    csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+                    module_id: moduleId,
+                    delete_module: true
+                },
+                success: function(response) {
+                    if (response.deleteModule) {
+                        $form.closest('.module-block').remove()
+
+                        moduleLessons.forEach(function(element) {
+                            element.remove()
+                        })
+                        moduleTasks.forEach(function(element) {
+                            element.remove()
+                        })
+
+                        var $optionToRemove = $('#dropdown-modules').find(`option[value="${moduleId}"]`)
+                        if ($optionToRemove.length) {
+                            $optionToRemove.remove()
+                        }
+                    } else {
+                        alert('Помилка при видаленні модулю: ' + response.error)
                     }
-                } else {
-                    alert('Помилка при видаленні модулю: ' + response.error)
-                }
-            },
+                },
+            })
         })
     })
 
@@ -167,10 +179,10 @@ $(document).ready(function() {
         var taskId = $form.find('input[name=task_id]').val()
         var lessonId = $form.find('input[name=lesson_id]').val()
 
-        $('#deleteconfirmform').off('submit').on('submit', function(event) {
+        $('#delete-task-confirm-form').off('submit').on('submit', function(event) {
             event.preventDefault()
 
-            console.log(taskId, lessonId)
+            // console.log(taskId, lessonId)
             
             $.ajax({
                 url: '/course/',
@@ -179,7 +191,7 @@ $(document).ready(function() {
                     csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
                     task_id: taskId,
                     lesson_id: lessonId,
-                    delete_task: true
+                    delete_task: true,
                 },
                 success: function(response) {
                     if (response.deleteTask) {
@@ -195,7 +207,7 @@ $(document).ready(function() {
                         }
                     } else {
                         // На случай ошибки при удалении, по типу если удаляемое задание не найдено
-                        alert('Ошибка при удалении задачи: ' + response.error)
+                        alert('Помилка при видаленні завдання: ' + response.error)
                     }
                 }
             });

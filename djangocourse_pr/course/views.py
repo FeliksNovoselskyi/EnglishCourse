@@ -17,9 +17,31 @@ def main_view(request):
         
     return render(request, 'course/main.html', context)
 
+def cell_order(cell_model, cell_order_from_request):
+    try:
+        cell_order = json.loads(cell_order_from_request)
+        for cell in cell_order:
+            order = cell['order']
+            cell_id = cell['id']
+            cell_model.objects.filter(id=cell_id).update(order=order)
+        return JsonResponse({'success': True})
+    except json.JSONDecodeError:
+        return JsonResponse({'success': False, 'error': 'Ошибка при передаче данных'})
+    
+# Проверка статуса пользователя, и дальнейшее указание того
+# какой контент должен быть на странице
+def check_status(request_user):
+    try:
+        user_status = request_user
+        
+        return user_status.role
+    except UserProfile.DoesNotExist: pass
+
 # Для страницы курса со всеми уроками и заданиями
 def course_view(request):
     context = {}
+    
+    context['user_status'] = check_status(request_user=UserProfile.objects.get(user=request.user))
     
     # _candelete добавлено в название чтобы отличить от другой переменной all_lessons
     all_lessons_candelete = Lesson.objects.all()
@@ -40,34 +62,20 @@ def course_view(request):
                 lesson.save()
     
     # print(idmatches)
-    
-    # Проверка статуса пользователя, и дальнейшее указание того
-    # какой контент должен быть на странице
-    try:
-        user_status = UserProfile.objects.get(user=request.user)
-        
-        if user_status.role == 'teacher':
-            context['user_status'] = 'teacher'
-        elif user_status.role == 'student':
-            context['user_status'] = 'student'
-    except UserProfile.DoesNotExist: pass
         
     if request.user.is_authenticated:
         context['username'] = request.user.username
         context['signed_in'] = True
         
     if request.method == 'POST':
-        if 'lesson_order' in request.POST:
-            try:
-                lesson_order = json.loads(request.POST['lesson_order'])
-                for lesson in lesson_order:
-                    lesson_id = lesson['id']
-                    order = lesson['order']
-                    Lesson.objects.filter(id=lesson_id).update(order=order)
-                return JsonResponse({'success': True})
-            except json.JSONDecodeError:
-                return JsonResponse({'success': False, 'error': 'Ошибка при передаче данных'})
-        
+        if 'cell_order' in request.POST:
+            sortable_obj_type = request.POST['sortable_obj_type']
+            
+            if sortable_obj_type == 'lesson':
+                cell_order(cell_model=Lesson, cell_order_from_request=request.POST['cell_order'])
+            if sortable_obj_type == 'module':
+                cell_order(cell_model=Module, cell_order_from_request=request.POST['cell_order'])
+                
         # Если от ajax-а пришло что пользователь добавляет задание
         if 'add_task' in request.POST:
             task_name = request.POST.get('taskname')
@@ -144,10 +152,14 @@ def course_view(request):
                 
                 task_url = reverse('task_detail', args=[task.id])
                 
+                print(check_status(request_user=UserProfile.objects.get(user=request.user)))
+                
                 task_html = render_to_string('course/task_block.html', {
                     'task': task,
+                    'module_id': selected_lesson.module_id,
                     'lesson_id': selected_lesson_value,
                     'task_url': task_url,
+                    'user_status': check_status(request_user=UserProfile.objects.get(user=request.user)),
                 }, request=request)
         
                 return JsonResponse({
@@ -197,7 +209,8 @@ def course_view(request):
                 lesson_id = lesson.id
                 
                 lesson_html = render_to_string('course/lesson_block.html', {
-                    'lesson': lesson    
+                    'lesson': lesson,
+                    'user_status': check_status(request_user=UserProfile.objects.get(user=request.user)),  
                 }, request=request)
                 
                 return JsonResponse({
@@ -228,7 +241,8 @@ def course_view(request):
                 module_id = module.id
                 
                 module_html = render_to_string('course/module_block.html', {
-                    'module': module
+                    'module': module,
+                    'user_status': check_status(request_user=UserProfile.objects.get(user=request.user)),
                 }, request=request)
                 
                 return JsonResponse({
@@ -260,7 +274,7 @@ def course_view(request):
         })
         
     courses = Course.objects.all()
-    modules = Module.objects.all()
+    modules = Module.objects.all().order_by('order')
     context['courses'] = courses
     context['modules'] = modules
     

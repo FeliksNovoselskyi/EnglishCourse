@@ -1,9 +1,14 @@
 {% load static %}
-<div class="module-block">
+<div class="module-block" data-module-id="{{module.id}}">
     <h3 class="module-name" data-module-id="{{module.id}}">{{module.module_name}}</h3>
-    <form method="post" id="delete-module-form" action="">
-        {% csrf_token %}
-        <input type="hidden" name="module_id" value="{{module.id}}">
-        <button type="submit" name="delete_module" class="delete-lesson-btn" id="delete-button-{{module.id}}"><img src="{% static 'images/delete.png' %}" alt="delete-module-img" class="delete-lessons-icon"></button>
-    </form>
-</div>
+    
+    {% if user_status == 'teacher' %}
+        <form method="post" id="delete-module-form" action="">
+            {% csrf_token %}
+            <input type="hidden" name="module_id" value="{{module.id}}">
+            <button type="submit" name="delete_module" class="delete-lesson-btn" id="delete-button-{{module.id}}" data-bs-toggle="modal" data-bs-target="#ModuleDeletingConfirmModal">
+                <img src="{% static 'images/delete.png' %}" alt="delete-module-img" class="delete-lessons-icon">
+            </button>
+        </form>
+    {% endif %}
+</div> 
