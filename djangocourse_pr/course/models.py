@@ -17,7 +17,7 @@ class Lesson(models.Model):
     can_delete = models.BooleanField(default=True)
     order = models.PositiveIntegerField(default=0)
     
-class UserProgress(models.Model):
+class Task(models.Model):
     lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
     task_name = models.CharField(max_length=10)
     excel_file = models.FileField(upload_to='excel_files/', blank=True, null=True)

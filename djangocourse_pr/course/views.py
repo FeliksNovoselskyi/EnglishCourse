@@ -45,7 +45,7 @@ def course_view(request):
     
     # _candelete добавлено в название чтобы отличить от другой переменной all_lessons
     all_lessons_candelete = Lesson.objects.all()
-    all_tasks = UserProgress.objects.all().values_list('lesson_id', flat=True)
+    all_tasks = Task.objects.all().values_list('lesson_id', flat=True)
 
     lesson_ids_with_tasks = set(all_tasks)
 
@@ -142,7 +142,7 @@ def course_view(request):
                 selected_lesson.can_delete = False
                 selected_lesson.save()
                 
-                task = UserProgress.objects.create(
+                task = Task.objects.create(
                     lesson = selected_lesson,
                     task_name = task_name,
                     english_sentences = english_sentences,
@@ -151,8 +151,6 @@ def course_view(request):
                 )
                 
                 task_url = reverse('task_detail', args=[task.id])
-                
-                print(check_status(request_user=UserProfile.objects.get(user=request.user)))
                 
                 task_html = render_to_string('course/task_block.html', {
                     'task': task,
@@ -179,10 +177,10 @@ def course_view(request):
             
             try:
                 # Получаем его из бд и удаляем на стороне сервера
-                task = UserProgress.objects.get(id=task_id)
+                task = Task.objects.get(id=task_id)
                 task.delete()
                 
-                remaining_tasks = UserProgress.objects.filter(lesson_id=lesson_id).exists()
+                remaining_tasks = Task.objects.filter(lesson_id=lesson_id).exists()
                 
                 if not remaining_tasks:
                     lesson = Lesson.objects.get(id=lesson_id)
@@ -192,7 +190,7 @@ def course_view(request):
                 # Отправляем ajax-у, что можно удалять задание на стороне клиента
                 return JsonResponse({'deleteTask': True, 'canDeleteLesson': not remaining_tasks})
             # На крайняк, если задания каким-то образом не будет
-            except UserProgress.DoesNotExist:
+            except Task.DoesNotExist:
                 return JsonResponse({'success': False, 'error': 'Завдання не знайдено'})
             
         if 'add_lesson' in request.POST:
@@ -267,7 +265,7 @@ def course_view(request):
     lessons_with_tasks = []
     
     for lesson in all_lessons:
-        tasks = UserProgress.objects.filter(lesson=lesson)
+        tasks = Task.objects.filter(lesson=lesson)
         lessons_with_tasks.append({
             'lesson': lesson,
             'tasks': tasks,
@@ -290,7 +288,7 @@ def task_detail_view(request, task_id):
         context['username'] = request.user.username
         context['signed_in'] = True
         
-    task = get_object_or_404(UserProgress, id=task_id)
+    task = get_object_or_404(Task, id=task_id)
     
     english_sentences = task.english_sentences
     ukrainian_sentences = task.ukrainian_sentences
