@@ -1,7 +1,6 @@
 $(document).ready(function () {
     const $lessons = $('.lessons')
     const $modules = $('#modules-list')
-
     const $userStatus = $('#user-status')
 
     const forLesson = 'lesson-id'
@@ -13,10 +12,8 @@ $(document).ready(function () {
                 animation: 150,
                 onEnd: function () {
                     const order = []
-    
-                    // Получаем все элементы в контейнере
-                    const containerCells = container.children()
-    
+                    const containerCells = container.children() // Получаем все элементы в контейнере
+                    const csrfToken = $('meta[name="csrf-token"]').attr('content') // Получаем csrf из тега meta в шаблоне
                     // Перебираем каждый элемент контейнера и сохраняем его id и порядок
                     containerCells.each(function (index) {
                         const cellId = $(this).data(dataAttr) // Получаем id элемента из data атрибута
@@ -25,9 +22,6 @@ $(document).ready(function () {
                             order: index + 1 // плюсуем 1 чтобы порядок начинался с 1, а не с нуля
                         })
                     })
-    
-                    // Получаем csrf из тега meta в шаблоне
-                    const csrfToken = $('meta[name="csrf-token"]').attr('content')
     
                     $.ajax({
                         type: 'POST',

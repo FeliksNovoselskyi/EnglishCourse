@@ -1,47 +1,28 @@
 from django.shortcuts import render, get_object_or_404
 from django.template.loader import render_to_string
 from django.http import JsonResponse
+
 from django.urls import reverse
 from .models import *
 from auth_reg.models import *
+
 import pandas
-import json
+import utils
 
 # Create your views here.
 def main_view(request):
     context = {}
     
-    if request.user.is_authenticated:
-        context['username'] = request.user.username
-        context['signed_in'] = True
+    utils.check_user_authentication(request, context)
         
     return render(request, 'course/main.html', context)
-
-def cell_order(cell_model, cell_order_from_request):
-    try:
-        cell_order = json.loads(cell_order_from_request)
-        for cell in cell_order:
-            order = cell['order']
-            cell_id = cell['id']
-            cell_model.objects.filter(id=cell_id).update(order=order)
-        return JsonResponse({'success': True})
-    except json.JSONDecodeError:
-        return JsonResponse({'success': False, 'error': 'Ошибка при передаче данных'})
-    
-# Проверка статуса пользователя, и дальнейшее указание того
-# какой контент должен быть на странице
-def check_status(request_user):
-    try:
-        user_status = request_user
-        
-        return user_status.role
-    except UserProfile.DoesNotExist: pass
 
 # Для страницы курса со всеми уроками и заданиями
 def course_view(request):
     context = {}
     
-    context['user_status'] = check_status(request_user=UserProfile.objects.get(user=request.user))
+    context['user_status'] = utils.check_status(request_user=UserProfile.objects.get(user=request.user))
+    utils.check_user_authentication(request, context)
     
     # _candelete добавлено в название чтобы отличить от другой переменной all_lessons
     all_lessons_candelete = Lesson.objects.all()
@@ -60,21 +41,17 @@ def course_view(request):
             if not lesson.can_delete:
                 lesson.can_delete = True
                 lesson.save()
-    
-    # print(idmatches)
-        
-    if request.user.is_authenticated:
-        context['username'] = request.user.username
-        context['signed_in'] = True
         
     if request.method == 'POST':
+        # Если происходит смена порядка элементов на странице с помощью библиотеки Sortable
+        # (уроки либо модули)
         if 'cell_order' in request.POST:
             sortable_obj_type = request.POST['sortable_obj_type']
             
             if sortable_obj_type == 'lesson':
-                cell_order(cell_model=Lesson, cell_order_from_request=request.POST['cell_order'])
+                utils.cell_order(cell_model=Lesson, cell_order_from_request=request.POST['cell_order'])
             if sortable_obj_type == 'module':
-                cell_order(cell_model=Module, cell_order_from_request=request.POST['cell_order'])
+                utils.cell_order(cell_model=Module, cell_order_from_request=request.POST['cell_order'])
                 
         # Если от ajax-а пришло что пользователь добавляет задание
         if 'add_task' in request.POST:
@@ -157,7 +134,7 @@ def course_view(request):
                     'module_id': selected_lesson.module_id,
                     'lesson_id': selected_lesson_value,
                     'task_url': task_url,
-                    'user_status': check_status(request_user=UserProfile.objects.get(user=request.user)),
+                    'user_status': utils.check_status(request_user=UserProfile.objects.get(user=request.user)),
                 }, request=request)
         
                 return JsonResponse({
@@ -208,7 +185,7 @@ def course_view(request):
                 
                 lesson_html = render_to_string('course/lesson_block.html', {
                     'lesson': lesson,
-                    'user_status': check_status(request_user=UserProfile.objects.get(user=request.user)),  
+                    'user_status': utils.check_status(request_user=UserProfile.objects.get(user=request.user)),  
                 }, request=request)
                 
                 return JsonResponse({
@@ -240,7 +217,7 @@ def course_view(request):
                 
                 module_html = render_to_string('course/module_block.html', {
                     'module': module,
-                    'user_status': check_status(request_user=UserProfile.objects.get(user=request.user)),
+                    'user_status': utils.check_status(request_user=UserProfile.objects.get(user=request.user)),
                 }, request=request)
                 
                 return JsonResponse({
@@ -284,9 +261,7 @@ def course_view(request):
 def task_detail_view(request, task_id):
     context = {}
     
-    if request.user.is_authenticated:
-        context['username'] = request.user.username
-        context['signed_in'] = True
+    utils.check_user_authentication(request, context)
         
     task = get_object_or_404(Task, id=task_id)
     

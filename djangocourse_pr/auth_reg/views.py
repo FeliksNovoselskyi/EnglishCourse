@@ -3,15 +3,14 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.db.utils import IntegrityError
 from auth_reg.models import *
+import utils
 
 # Create your views here.
 # Функция обработки авторизации
 def auth_view(request):
     context = {}
     
-    if request.user.is_authenticated:
-        context['username'] = request.user.username
-        context['signed_in'] = True
+    utils.check_user_authentication(request, context)
     
     if 'submit_btn' in request.POST:
         # Проверка, если пользователь уже вошел в аккаунт при попытке входа
@@ -40,9 +39,7 @@ def auth_view(request):
 def reg_view(request):
     context = {}
     
-    if request.user.is_authenticated:
-        context['username'] = request.user.username
-        context['signed_in'] = True
+    utils.check_user_authentication(request, context)
         
     if request.method == 'POST':
         username = request.POST.get('username_inp')

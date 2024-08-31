@@ -8,5 +8,5 @@ document.addEventListener('DOMContentLoaded', function () {
             const taskUrl = element.getAttribute('data-task-url') // Получения нужной ссылки из атрибутов шаблона
             window.location.href = taskUrl
         })
-    });
-});
+    })
+})
