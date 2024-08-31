@@ -4,6 +4,8 @@
 {% block links %}
     <link rel="stylesheet" href="{% static 'css/course.css' %}">
     <script src="{% static 'js/elements_sortable.js' %}" defer></script>
+    <script src="{% static 'js/selecting_module.js' %}" defer></script>
+
     <meta name="csrf-token" content="{{csrf_token}}">
 {% endblock %}
 
@@ -40,8 +42,8 @@
                 </div>
             {% endif %}
 
-            <div class="lessons">
-                {% for lesson_with_tasks in lessons_with_tasks %}
+            <div class="lessons" data-module-id="{{current_module_id}}">
+                <!-- {% for lesson_with_tasks in lessons_with_tasks %}
                     <div class="lessons-from-backend" id="module-lesson-id-{{lesson_with_tasks.lesson.module_id}}" data-lesson-id="{{lesson_with_tasks.lesson.id}}">
                         <div class="lesson-head">
                             <h4 class="lesson-name">{{lesson_with_tasks.lesson.lesson_name}}</h3>
@@ -79,8 +81,9 @@
                             {% endfor %}
                         </div>
                     </div>
-                {% endfor %}
+                {% endfor %} -->
             </div>
+            <p id="no-lessons-message">В цьому модулі ще немає уроків</p>
         </div>
 
         <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">

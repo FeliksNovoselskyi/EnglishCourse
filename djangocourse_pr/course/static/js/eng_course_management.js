@@ -10,6 +10,30 @@ $(document).ready(function() {
         })
     }
 
+    function updateLessonDisplay() {
+        var lessonsContainer = $('.lessons')
+        var noLessonsMessage = $('#no-lessons-message')
+        var moduleContainer = document.querySelector('#modules-list')
+    
+        if (document.querySelectorAll('.module-block').length === 0) {
+            noLessonsMessage.hide()
+            return;
+        }
+
+        if (window.moduleSelected) {
+            // Проверяем, есть ли элементы уроков в текущем модуле
+            if (lessonsContainer.children().length > 0) {
+                noLessonsMessage.hide()
+            } else {
+                noLessonsMessage.show()
+            }
+        } else {
+            noLessonsMessage.hide()
+        }
+    }
+
+    setInterval(updateLessonDisplay, 1)
+    
     // Добавление модуля
     $('#addmoduleform').submit(function(event) {
         event.preventDefault()
@@ -41,8 +65,6 @@ $(document).ready(function() {
 
         var $form = $(this)
         var moduleId = $form.find('input[name=module_id]').val()
-        var moduleLessons = document.querySelectorAll(`#module-lesson-id-${moduleId}`)
-        var moduleTasks = document.querySelectorAll(`#module-task-id-${moduleId}`)
 
         $('#delete-module-confirm-form').off('submit').on('submit', function(event) {
             event.preventDefault()
@@ -56,17 +78,24 @@ $(document).ready(function() {
                 if (response.deleteModule) {
                     $form.closest('.module-block').remove()
 
-                    moduleLessons.forEach(function(element) {
-                        element.remove()
-                    })
-                    moduleTasks.forEach(function(element) {
-                        element.remove()
-                    })
+                    // Установка задержки перед удалением со страницы чтобы удаляемое успело загрузится
+                    setTimeout(() => {
+                        const moduleLessons = document.querySelectorAll(`#module-lesson-id-${moduleId}`)
+                        const moduleTasks = document.querySelectorAll(`#module-task-id-${moduleId}`)
+                    
+                        // console.log('Уроки модуля после задержки:', moduleLessons)
+                        // console.log('Задания модуля после задержки:', moduleTasks)
+                    
+                        moduleLessons.forEach(element => element.remove())
+                        moduleTasks.forEach(element => element.remove())
+                    }, 1)
 
                     var $optionToRemove = $('#dropdown-modules').find(`option[value="${moduleId}"]`)
                     if ($optionToRemove.length) {
                         $optionToRemove.remove()
                     }
+
+                    updateLessonDisplay()
                 } else {
                     alert('Помилка при видаленні модулю: ' + response.error)
                 }
@@ -92,10 +121,16 @@ $(document).ready(function() {
             if (response.error) {
                 $('#error-message-lesson').text(response.error)
             } else if (response.addLesson) {
-                $('.lessons').append(response.lesson_html);
-                $('#dropdown-lessons').append(`
-                    <option value="${response.lessonId}">${response.lessonName}</option>
-                `)
+                // Проверка, если текущий модуль совпадает с модулем урока
+                var currentModuleId = $('.lessons').data('module-id')
+
+                if (currentModuleId === parseInt(moduleId)) {
+                    $('.lessons').append(response.lesson_html)
+                    $('#dropdown-lessons').append(`
+                        <option value="${response.lessonId}">${response.lessonName}</option>
+                    `)
+                    updateLessonDisplay()
+                }
             }
         })
     })
@@ -115,6 +150,8 @@ $(document).ready(function() {
         ajaxRequest('/course/', 'POST', data, function(response) {
             if (response.deleteLesson) {
                 $form.closest('.lessons-from-backend').remove()
+
+                updateLessonDisplay()
 
                 var $optionToRemove = $('#dropdown-lessons').find(`option[value="${lessonId}"]`)
                 if ($optionToRemove.length) {

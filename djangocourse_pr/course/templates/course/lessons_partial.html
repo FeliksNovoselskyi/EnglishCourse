@@ -1,0 +1,43 @@
+{% load static %}
+
+{% for lesson_with_tasks in lessons_with_tasks %}
+    <div class="lessons-from-backend" id="module-lesson-id-{{lesson_with_tasks.lesson.module_id}}" data-lesson-id="{{lesson_with_tasks.lesson.id}}">
+        <div class="lesson-head">
+            <h4 class="lesson-name">{{lesson_with_tasks.lesson.lesson_name}}</h4>
+            {% if user_status == 'teacher' %}
+                <form method="post" class="delete-lesson-form-{{lesson_with_tasks.lesson.id}}" id="delete-lesson-formid" action="">
+                    {% csrf_token %}
+                    <input type="hidden" name="lesson_id" value="{{lesson_with_tasks.lesson.id}}">
+                    {% if lesson_with_tasks.lesson.can_delete == 1 %}
+                    <button type="submit" name="delete_lesson" class="delete-lesson-btn" id="delete-button-{{lesson_with_tasks.lesson.id}}">
+                        <img src="{% static 'images/delete.png' %}" alt="delete-lesson-img" class="delete-lessons-icon">
+                    </button>
+                    {% endif %}
+                </form>
+            {% endif %}
+        </div>
+
+        <div class="lesson-tasks" data-lesson-id="{{lesson_with_tasks.lesson.id}}">
+            {% for task in lesson_with_tasks.tasks %}
+                <div class="course-block" id="module-task-id-{{lesson_with_tasks.lesson.module_id}}">
+                    <div class="course-icon-block clickable-task" data-task-url="{% url 'task_detail' task.id %}">
+                        <img src="{% static 'images/finished.png' %}" alt="finished-img" class="course-imgs">
+                    </div>
+                    <div class="task-change-icons">
+                        {% if user_status == 'teacher' %}
+                            <form method="post" class="delete-task-form" action="">
+                                {% csrf_token %}
+                                <input type="hidden" name="task_id" value="{{task.id}}">
+                                <input type="hidden" name="lesson_id" value="{{lesson_with_tasks.lesson.id}}">
+                                <button type="submit" name="delete_task" class="delete-task-btn" data-bs-toggle="modal" data-bs-target="#TaskDeletingConfirmModal">
+                                    <img src="{% static 'images/delete.png' %}" alt="change-task-img" class="small-course-imgs">
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
+                    <div class="task-name-popup" data-task-url="{% url 'task_detail' task.id %}">{{task.task_name}}</div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endfor %}

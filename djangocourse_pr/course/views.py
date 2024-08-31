@@ -17,7 +17,7 @@ def main_view(request):
         
     return render(request, 'course/main.html', context)
 
-# Для страницы курса со всеми уроками и заданиями
+# Для страницы курса со всеми модулями, уроками и заданиями
 def course_view(request):
     context = {}
     
@@ -43,6 +43,25 @@ def course_view(request):
                 lesson.save()
         
     if request.method == 'POST':
+        if 'filter_by_module' in request.POST:
+            module_id = request.POST.get('module_id')
+            lessons_with_tasks = []
+            lessons = Lesson.objects.filter(module_id=module_id).order_by('order')
+            
+            for lesson in lessons:
+                tasks = Task.objects.filter(lesson=lesson)
+                lessons_with_tasks.append({
+                    'lesson': lesson,
+                    'tasks': tasks,
+                })
+
+            lessons_html = render_to_string('course/lessons_partial.html', {
+                'lessons_with_tasks': lessons_with_tasks,
+                'user_status': utils.check_status(request_user=UserProfile.objects.get(user=request.user)),
+            }, request=request)
+            
+            return JsonResponse({'lessons_html': lessons_html})
+        
         # Если происходит смена порядка элементов на странице с помощью библиотеки Sortable
         # (уроки либо модули)
         if 'cell_order' in request.POST:
@@ -252,8 +271,10 @@ def course_view(request):
     modules = Module.objects.all().order_by('order')
     context['courses'] = courses
     context['modules'] = modules
-    
     context['lessons_with_tasks'] = lessons_with_tasks
+    
+    current_module_id = request.GET.get('module_id', None)
+    context['current_module_id'] = current_module_id
     
     return render(request, 'course/course.html', context)
 
