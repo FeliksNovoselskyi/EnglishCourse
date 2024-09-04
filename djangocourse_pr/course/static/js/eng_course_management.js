@@ -110,6 +110,7 @@ $(document).ready(function() {
         var $form = $(this)
         var lessonName = $('input[name=lessonname]').val()
         var moduleId = $form.find('select[name=module_id]').val()
+        var currentModuleId = $('.lessons').attr('data-module-id')
 
         var data = new FormData()
         data.append('csrfmiddlewaretoken', $('input[name=csrfmiddlewaretoken]').val())
@@ -122,9 +123,10 @@ $(document).ready(function() {
                 $('#error-message-lesson').text(response.error)
             } else if (response.addLesson) {
                 // Проверка, если текущий модуль совпадает с модулем урока
-                var currentModuleId = $('.lessons').data('module-id')
 
-                if (currentModuleId === parseInt(moduleId)) {
+                console.log(currentModuleId, parseInt(moduleId))
+
+                if (parseInt(currentModuleId) === parseInt(moduleId)) {
                     $('.lessons').append(response.lesson_html)
                     $('#dropdown-lessons').append(`
                         <option value="${response.lessonId}">${response.lessonName}</option>

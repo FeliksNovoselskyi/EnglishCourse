@@ -1,0 +1,3 @@
+{% for lesson_with_tasks in lessons_with_tasks %}
+    <option value="{{lesson_with_tasks.lesson.id}}">{{lesson_with_tasks.lesson.lesson_name}}</option>
+{% endfor %}

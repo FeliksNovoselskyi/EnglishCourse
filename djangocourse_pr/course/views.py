@@ -60,7 +60,14 @@ def course_view(request):
                 'user_status': utils.check_status(request_user=UserProfile.objects.get(user=request.user)),
             }, request=request)
             
-            return JsonResponse({'lessons_html': lessons_html})
+            dropdown_lessons_html = render_to_string('course/lesson_dropdown_for_tasks.html', {
+                'lessons_with_tasks': lessons_with_tasks,
+            }, request=request)
+            
+            return JsonResponse({
+                'lessons_html': lessons_html,
+                'dropdown_lessons': dropdown_lessons_html,
+            })
         
         # Если происходит смена порядка элементов на странице с помощью библиотеки Sortable
         # (уроки либо модули)

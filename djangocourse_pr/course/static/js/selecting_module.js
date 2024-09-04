@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
     const moduleBlocks = document.querySelectorAll('.module-block')
     const lessonsContainer = document.querySelector('.lessons')
+    const dropdownLessons = document.querySelector('#dropdown-lessons')
     const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content')
     
     window.moduleSelected = false
@@ -24,9 +25,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     filter_by_module: true,
                     module_id: moduleId
                 },
-                success: function (data) {
-                    if (data.lessons_html) {
-                        lessonsContainer.innerHTML = data.lessons_html
+                success: function (response) {
+                    if (response.lessons_html) {
+                        lessonsContainer.innerHTML = response.lessons_html
+                        dropdownLessons.innerHTML = response.dropdown_lessons
                     }
                 },
             })
