@@ -343,12 +343,11 @@
     align-items: center;
     border-bottom: 2px solid black;
     gap: 10px;
+    cursor: pointer;
 }
 
 .selected-module {
-    background-color: rgba(255, 166, 0, 0.464);
-    border-top-right-radius: 16px;
-    border-top-left-radius: 16px;
+    background-color: rgba(238, 181, 75, 0.703);
 }
 
 .module-name {
