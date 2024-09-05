@@ -345,6 +345,12 @@
     gap: 10px;
 }
 
+.selected-module {
+    background-color: rgba(255, 166, 0, 0.464);
+    border-top-right-radius: 16px;
+    border-top-left-radius: 16px;
+}
+
 .module-name {
     font-size: 22.5px;
     margin-top: 5px;
