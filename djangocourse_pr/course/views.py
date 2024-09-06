@@ -43,6 +43,7 @@ def course_view(request):
                 lesson.save()
         
     if request.method == 'POST':
+        # Если был выбран модуль
         if 'filter_by_module' in request.POST:
             module_id = request.POST.get('module_id')
             lessons_with_tasks = []
@@ -55,11 +56,15 @@ def course_view(request):
                     'tasks': tasks,
                 })
 
+            # Получаем шаблон, в котором находятся уроки из выбранного модуля, для передачи его
+            # в ajax, а потом и на саму страницу
             lessons_html = render_to_string('course/lessons_partial.html', {
                 'lessons_with_tasks': lessons_with_tasks,
                 'user_status': utils.check_status(request_user=UserProfile.objects.get(user=request.user)),
             }, request=request)
             
+            # Отображаем в меню выбора уроков для создания задания
+            # только те уроки, которые находятся в модуле выбранном пользователем
             dropdown_lessons_html = render_to_string('course/lesson_dropdown_for_tasks.html', {
                 'lessons_with_tasks': lessons_with_tasks,
             }, request=request)

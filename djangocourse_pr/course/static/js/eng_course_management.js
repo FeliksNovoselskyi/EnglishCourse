@@ -1,4 +1,5 @@
 $(document).ready(function() {
+    // Единая и универсальная функция для ajax запросов
     function ajaxRequest(url, type, data, successCallback) {
         $.ajax({
             url: url,
@@ -10,10 +11,10 @@ $(document).ready(function() {
         })
     }
 
+    // Проверяем выбран ли модуль, и отображаем соответствующий контент на странице
     function updateLessonDisplay() {
         var lessonsContainer = $('.lessons')
         var noLessonsMessage = $('#no-lessons-message')
-        var moduleContainer = document.querySelector('#modules-list')
     
         if (document.querySelectorAll('.module-block').length === 0) {
             noLessonsMessage.hide()
@@ -32,6 +33,7 @@ $(document).ready(function() {
         }
     }
 
+    // Каждую миллисекунду проверяем, выбран ли модуль пользователем
     setInterval(updateLessonDisplay, 1)
     
     // Добавление модуля

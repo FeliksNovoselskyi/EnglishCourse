@@ -6,6 +6,8 @@ $(document).ready(function () {
     const forLesson = 'lesson-id'
     const forModule = 'module-id'
 
+    // Функция для сортировки элементов страницы (например уроки или модули)
+    // библиотека Sortable в jQuery
     function sortableContainer(container, dataAttr, sortableObjType) {
         if (container.length && $userStatus.val() == 'teacher') {
             new Sortable(container[0], {
@@ -35,7 +37,7 @@ $(document).ready(function () {
                             // console.log('свержение порядка среди уроков было успешно')
                         },
                     })
-                }
+                },
             })
         }
     }
