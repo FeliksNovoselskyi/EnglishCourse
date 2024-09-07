@@ -16,7 +16,8 @@
 
 Головною перевагою проекту є масштабне використання технології AJAX, завдяки чому майже всі операції — заповнення, створення, видалення та проходження завдань — виконуються швидко та без оновлення сторінок
 
-## Встановлення
+## Встановлення та запуск
+### Якщо Django встановлений
 #### 1. Клонування репозиторію
 ```
 git clone https://github.com/FeliksNovoselskyi/course-tasks-practice.git
@@ -25,7 +26,45 @@ git clone https://github.com/FeliksNovoselskyi/course-tasks-practice.git
 ```
 cd djangocourse_pr
 ```
-#### 3. Запуск локального серверу
+#### 3. Встановіть необхідні бібліотеки для створення завданнь
+```
+pip install pandas
+```
+```
+pip install openpyxl
+```
+#### 4. Запуск локального серверу
+Для Windows
+```
+python manage.py runserver
+```
+Для MacOS/Linux
+```
+python3 manage.py runserver
+```
+
+### Якщо Django НЕ встановлений
+#### 1. Встановіть Django
+```
+pip install django
+```
+
+#### 2. Клонування репозиторію
+```
+git clone https://github.com/FeliksNovoselskyi/course-tasks-practice.git
+```
+#### 3. Перехід до головної директорії проекту з файлом ```manage.py```
+```
+cd djangocourse_pr
+```
+#### 4. Встановіть необхідні бібліотеки для створення завданнь
+```
+pip install pandas
+```
+```
+pip install openpyxl
+```
+#### 5. Запуск локального серверу
 Для Windows
 ```
 python manage.py runserver
