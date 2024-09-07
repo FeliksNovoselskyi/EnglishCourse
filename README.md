@@ -1,6 +1,6 @@
 # Course Project - Проект курсу для навчання
 
-![Python](https://img.shields.io/badge/python-3.12-blue)
+![Python](https://img.shields.io/badge/python-3.12.5-blue)
 ![Django](https://img.shields.io/badge/django-5.0-brightgreen)
 ![jQuery](https://img.shields.io/badge/jQuery-3.6.0-blue)
 ![Sortable.js](https://img.shields.io/badge/Sortable.js-1.14.0-orange)
