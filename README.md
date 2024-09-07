@@ -1,5 +1,15 @@
 # Course Project - Проект курсу для навчання
 
+![Python](https://img.shields.io/badge/python-3.12-blue)
+![Django](https://img.shields.io/badge/django-5.0-brightgreen)
+![jQuery](https://img.shields.io/badge/jQuery-3.6.0-blue)
+![Sortable.js](https://img.shields.io/badge/Sortable.js-1.14.0-orange)
+![AJAX](https://img.shields.io/badge/AJAX-technology-orange)
+![JavaScript](https://img.shields.io/badge/JavaScript-ES6-yellow)
+![HTML/CSS](https://img.shields.io/badge/HTML%2FCSS-blue)
+![Bootstrap 5](https://img.shields.io/badge/Bootstrap-5.0-purple)
+![Figma](https://img.shields.io/badge/Figma-design-blueviolet)
+
 ## Опис проекту
 
 Цей проект є курсом для навчання студентів та створенням уроків і завдань з боку вчителів. Вчителі мають зручний інтерфейс для створення модулів, уроків та завдань для учнів, а учні можуть швидко проходити створені завдання. 
