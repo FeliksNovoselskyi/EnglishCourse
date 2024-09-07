@@ -16,3 +16,12 @@
 - **[AJAX](https://api.jquery.com/category/ajax/)** — технологія для швидкої та зручної роботи з даними без оновлення сторінок.
 - **[HTML](https://developer.mozilla.org/en-US/docs/Web/HTML)/[CSS](https://developer.mozilla.org/en-US/docs/Learn/CSS)** — мови для верстки сайту, створення його структури та стилів.
 - **[Bootstrap 5](https://getbootstrap.com/)** — фронтенд-фреймворк для створення деяких елементів на сторінках.
+
+## Структура проекту
+```mermaid
+graph TD;
+    A[djangocourse_pr] --> B[course] --> C[Додаток для 
+    головної сторінки, та сторінки з курсом];
+    A --> D[auth_reg] --> E[Додаток сторінок 
+    реєстрації];
+```
