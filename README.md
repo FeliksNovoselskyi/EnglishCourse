@@ -9,6 +9,7 @@
 ![HTML/CSS](https://img.shields.io/badge/HTML%2FCSS-blue)
 ![Bootstrap 5](https://img.shields.io/badge/Bootstrap-5.0-purple)
 ![Figma](https://img.shields.io/badge/Figma-design-blueviolet)
+![Open Source](https://img.shields.io/badge/Open%20Source-%E2%9D%A4%EF%B8%8F-blue)
 
 ## Опис проекту
 
@@ -114,6 +115,41 @@ graph TD;
 
 ## Функціонал проекту
 ### BACKEND
+#### Файл djangocourse_pr/utils.py
+```python
+from django.http import JsonResponse
+from auth_reg.models import *
+import json
+
+# Перевірка чи авторизований користувач для виводу його імені на сторінці
+def check_user_authentication(request, context):
+    if request.user.is_authenticated:
+        context['username'] = request.user.username
+        context['signed_in'] = True
+
+# Зміна порядку уроків або модулів на бекенді, зі збереженням цього порядку у базі даних
+def cell_order(cell_model, cell_order_from_request):
+    try:
+        cell_order = json.loads(cell_order_from_request)
+        for cell in cell_order:
+            order = cell['order']
+            cell_id = cell['id']
+            cell_model.objects.filter(id=cell_id).update(order=order)
+        return JsonResponse({'success': True})
+    except json.JSONDecodeError:
+        return JsonResponse({'success': False, 'error': 'Ошибка при передаче данных'})
+    
+# Перевірка статусу користувача, та подальше вказування на те
+# який контент має бути на сторінкці
+def check_status(request_user):
+    try:
+        user_status = request_user
+
+        return user_status.role
+    except UserProfile.DoesNotExist: pass
+```
+Цей файл створений для загальних функцій у проекті, та інших, щоб не перенавантажувати код проекту у файлах ```views.py```
+
 #### Файл djangocourse_pr/course/views.py
 ```python
 from django.shortcuts import render, get_object_or_404
