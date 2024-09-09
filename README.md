@@ -114,6 +114,628 @@ graph TD;
 ```
 
 ## Функціонал проекту
+### FRONTEND
+#### Файл djangocourse_pr/course/static/js/task_redirect.js
+```javascript
+document.addEventListener('DOMContentLoaded', function () {
+    // Находим родительский элемент, который существует на момент загрузки страницы
+    const container = document.querySelector('.lessons')
+
+    // Назначаем обработчик клика на родительский элемент
+    container.addEventListener('click', function(event) {
+        const target = event.target.closest('.course-icon-block.clickable-task, .task-name-popup')
+        if (target) {
+            const taskUrl = target.getAttribute('data-task-url')
+            if (taskUrl) {
+                window.location.href = taskUrl
+            }
+        }
+    })
+})
+```
+Цей файл забезпечує перехід до унікальної сторінки кожного завдання, отримуючи елементі, при натисканні на які можна переміститись на завдання, та обрабляючи клік на них, переносячи на потрібну сторінку з завданням
+
+#### Файл djangocourse_pr/course/static/js/selecting_module.js
+```javascript
+document.addEventListener('DOMContentLoaded', function () {
+    const lessonsContainer = document.querySelector('.lessons')
+    const dropdownLessons = document.querySelector('#dropdown-lessons')
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+    
+    // Обозначаем переменную moduleSelected с булевым значением
+    window.moduleSelected = false
+    
+    let moduleBlocks = document.querySelectorAll('.module-block')
+    
+    // Получаем уроки после динамических обновлений контента на странице
+    // (для корректного отображения выделения на модуля на странице)
+    function updateModuleBlocks() {
+        moduleBlocks = document.querySelectorAll('.module-block')
+    }
+
+    document.addEventListener('click', function(event) {
+        const target = event.target.closest('.module-block')
+
+        // Обрабатываем клик на один из модулей для отображения его уроков
+        if (target) {
+            const moduleId = target.dataset.moduleId
+
+            moduleBlocks.forEach(
+                block => block.classList.remove('selected-module')
+            )
+
+            // Добавляем класс selected-module только выбранному модулю
+            target.classList.add('selected-module')
+
+            // В отрисованные уроки записываем id модуля в data атрибут
+            lessonsContainer.dataset.moduleId = moduleId
+            window.moduleSelected = true
+
+            $.ajax({
+                type: 'POST',
+                url: window.location.href,
+                data: {
+                    csrfmiddlewaretoken: csrfToken,
+                    filter_by_module: true,
+                    module_id: moduleId,
+                },
+                success: function (response) {
+                    if (response.lessons_html) {
+                        lessonsContainer.innerHTML = response.lessons_html
+                        dropdownLessons.innerHTML = response.dropdown_lessons
+                        updateModuleBlocks()
+                    }
+                },
+            })
+        }
+    })
+})
+```
+У цьому файлі обробляється натискання на кожний модуль, та відправлення AJAX запросу на сервер, щоб отримати уроки з обраного модуля. Завдяки цьому на сторінці відображається тільки той контент що відноситься до цього модуля.
+
+#### Файл djangocourse_pr/course/static/js/eng_course_management.js
+```javascript
+$(document).ready(function() {
+    // Единая и универсальная функция для ajax запросов
+    function ajaxRequest(url, type, data, successCallback) {
+        $.ajax({
+            url: url,
+            type: type,
+            data: data,
+            contentType: false,  // Устанавливаем по умолчанию false, так как это подходит для всех случаев
+            processData: false,  // Устанавливаем по умолчанию false, так как это подходит для всех случаев
+            success: successCallback,
+        })
+    }
+
+    // Проверяем выбран ли модуль, и отображаем соответствующий контент на странице
+    function updateLessonDisplay() {
+        var lessonsContainer = $('.lessons')
+        var noLessonsMessage = $('#no-lessons-message')
+    
+        if (document.querySelectorAll('.module-block').length === 0) {
+            noLessonsMessage.hide()
+            return;
+        }
+
+        if (window.moduleSelected) {
+            // Проверяем, есть ли элементы уроков в текущем модуле
+            if (lessonsContainer.children().length > 0) {
+                noLessonsMessage.hide()
+            } else {
+                noLessonsMessage.show()
+            }
+        } else {
+            noLessonsMessage.hide()
+        }
+    }
+
+    // Каждую миллисекунду проверяем, выбран ли модуль пользователем
+    setInterval(updateLessonDisplay, 1)
+    
+    // Добавление модуля
+    $('#addmoduleform').submit(function(event) {
+        event.preventDefault()
+
+        var moduleName = $('input[name=modulename]').val()
+        var courseId = $('select[name=course_id]').val()
+        
+        var data = new FormData()
+        data.append('csrfmiddlewaretoken', $('input[name=csrfmiddlewaretoken]').val())
+        data.append('add_module', true)
+        data.append('modulename', moduleName)
+        data.append('course_id', courseId)
+
+        ajaxRequest('/course/', 'POST', data, function(response) {
+            if (response.error) {
+                $('#error-message-module').text(response.error)
+            } else if (response.addModule) {
+                $('#modules-list').append(response.module_html)
+                $('#dropdown-modules').append(`
+                    <option value="${response.moduleId}">${response.moduleName}</option>
+                `)
+            }
+        })
+    })
+
+    // Удаление модуля
+    $('#modules-list').on('submit', '#delete-module-form', function(event) {
+        event.preventDefault()
+
+        var $form = $(this)
+        var moduleId = $form.find('input[name=module_id]').val()
+
+        $('#delete-module-confirm-form').off('submit').on('submit', function(event) {
+            event.preventDefault()
+
+            var data = new FormData()
+            data.append('csrfmiddlewaretoken', $('input[name=csrfmiddlewaretoken]').val())
+            data.append('module_id', moduleId)
+            data.append('delete_module', true)
+
+            ajaxRequest('/course/', 'POST', data, function(response) {
+                if (response.deleteModule) {
+                    $form.closest('.module-block').remove()
+
+                    // Установка задержки перед удалением со страницы чтобы удаляемое успело загрузится
+                    setTimeout(() => {
+                        const moduleLessons = document.querySelectorAll(`#module-lesson-id-${moduleId}`)
+                        const moduleTasks = document.querySelectorAll(`#module-task-id-${moduleId}`)
+                    
+                        // console.log('Уроки модуля после задержки:', moduleLessons)
+                        // console.log('Задания модуля после задержки:', moduleTasks)
+                    
+                        moduleLessons.forEach(element => element.remove())
+                        moduleTasks.forEach(element => element.remove())
+                    }, 1)
+
+                    var $optionToRemove = $('#dropdown-modules').find(`option[value="${moduleId}"]`)
+                    if ($optionToRemove.length) {
+                        $optionToRemove.remove()
+                    }
+
+                    updateLessonDisplay()
+                } else {
+                    alert('Помилка при видаленні модулю: ' + response.error)
+                }
+            })
+        })
+    })
+
+    // Добавление урока
+    $('#addlessonform').submit(function(event) {
+        event.preventDefault()
+
+        var $form = $(this)
+        var lessonName = $('input[name=lessonname]').val()
+        var moduleId = $form.find('select[name=module_id]').val()
+        var currentModuleId = $('.lessons').attr('data-module-id')
+
+        var data = new FormData()
+        data.append('csrfmiddlewaretoken', $('input[name=csrfmiddlewaretoken]').val())
+        data.append('add_lesson', true)
+        data.append('lessonname', lessonName)
+        data.append('module_id', moduleId)
+
+        ajaxRequest('/course/', 'POST', data, function(response) {
+            if (response.error) {
+                $('#error-message-lesson').text(response.error)
+            } else if (response.addLesson) {
+                // Проверка, если текущий модуль совпадает с модулем урока
+
+                console.log(currentModuleId, parseInt(moduleId))
+
+                if (parseInt(currentModuleId) === parseInt(moduleId)) {
+                    $('.lessons').append(response.lesson_html)
+                    $('#dropdown-lessons').append(`
+                        <option value="${response.lessonId}">${response.lessonName}</option>
+                    `)
+                    updateLessonDisplay()
+                }
+            }
+        })
+    })
+
+    // Удаление урока
+    $('.lessons').on('submit', '#delete-lesson-formid', function(event) {
+        event.preventDefault()
+
+        var $form = $(this)
+        var lessonId = $form.find('input[name=lesson_id]').val()
+
+        var data = new FormData()
+        data.append('csrfmiddlewaretoken', $('input[name=csrfmiddlewaretoken]').val())
+        data.append('lesson_id', lessonId)
+        data.append('delete_lesson', true)
+
+        ajaxRequest('/course/', 'POST', data, function(response) {
+            if (response.deleteLesson) {
+                $form.closest('.lessons-from-backend').remove()
+
+                updateLessonDisplay()
+
+                var $optionToRemove = $('#dropdown-lessons').find(`option[value="${lessonId}"]`)
+                if ($optionToRemove.length) {
+                    $optionToRemove.remove()
+                }
+            } else {
+                alert('Помилка при видаленні уроку: ' + response.error)
+            }
+        })
+    })
+
+    // Добавление задания
+    $('#addnameform').submit(function(event) {
+        event.preventDefault()
+
+        var selectedLesson = document.querySelector('#dropdown-lessons')
+        var formData = new FormData()
+        formData.append('csrfmiddlewaretoken', $('input[name=csrfmiddlewaretoken]').val())
+        formData.append('taskname', $('input[name=taskname]').val())
+        formData.append('taskfile', $('input[name=taskfile]')[0].files[0])
+        formData.append('additional_words_file', $('input[name=additional_words_file]')[0].files[0])
+        formData.append('selected_lesson_value', selectedLesson.value)
+        formData.append('add_task', true)
+
+        ajaxRequest('/course/', 'POST', formData, function(response) {
+            if (response.addName) {
+                $('#error-message').text(response.error)
+
+                var lessonBlock = $('.lessons-from-backend').filter(function() {
+                    return $(this).find('input[name=lesson_id]').val() === selectedLesson.value
+                })
+
+                lessonBlock.find('.lesson-tasks').append(response.task_html)
+            } if (response.canDeleteLesson === false) {
+                $('#delete-button-' + selectedLesson.value).remove()
+            } if (response.error) {
+                $('#error-message').text(response.error)
+            }
+        })
+    })
+
+    // Удаление задания
+    $('.lessons').on('submit', '.delete-task-form', function(event) {
+        event.preventDefault()
+
+        var $form = $(this)
+        var taskId = $form.find('input[name=task_id]').val()
+        var lessonId = $form.find('input[name=lesson_id]').val()
+
+        $('#delete-task-confirm-form').off('submit').on('submit', function(event) {
+            event.preventDefault()
+
+            var data = new FormData()
+            data.append('csrfmiddlewaretoken', $('input[name=csrfmiddlewaretoken]').val())
+            data.append('task_id', taskId)
+            data.append('lesson_id', lessonId)
+            data.append('delete_task', true)
+
+            ajaxRequest('/course/', 'POST', data, function(response) {
+                if (response.deleteTask) {
+                    $form.closest('.course-block').remove()
+
+                    if (response.canDeleteLesson) {
+                        $('.delete-lesson-form-' + lessonId).append(`
+                            <button type="submit" name="delete_lesson" class="delete-lesson-btn" id="delete-button-${lessonId}">
+                                <img src="/static/images/delete.png" alt="delete-lesson-img" class="delete-lessons-icon">
+                            </button>
+                        `)
+                    }
+                } else {
+                    alert('Помилка при видаленні завдання: ' + response.error)
+                }
+            })
+        })
+    })
+})
+```
+Цей файлі проходить керівництво курсу вчителем, тут обробляється створення модулів, уроків та завдань, а також їхнє видалення. Усе виконується за допомогою технології AJAX
+
+#### Файл djangocourse_pr/course/static/js/elements_sortable.js
+```javascript
+$(document).ready(function () {
+    const $lessons = $('.lessons')
+    const $modules = $('#modules-list')
+    const $userStatus = $('#user-status')
+
+    const forLesson = 'lesson-id'
+    const forModule = 'module-id'
+
+    // Функция для сортировки элементов страницы (например уроки или модули)
+    // библиотека Sortable в jQuery
+    function sortableContainer(container, dataAttr, sortableObjType) {
+        if (container.length && $userStatus.val() == 'teacher') {
+            new Sortable(container[0], {
+                animation: 150,
+                onEnd: function () {
+                    const order = []
+                    const containerCells = container.children() // Получаем все элементы в контейнере
+                    const csrfToken = $('meta[name="csrf-token"]').attr('content') // Получаем csrf из тега meta в шаблоне
+                    // Перебираем каждый элемент контейнера и сохраняем его id и порядок
+                    containerCells.each(function (index) {
+                        const cellId = $(this).data(dataAttr) // Получаем id элемента из data атрибута
+                        order.push({
+                            id: cellId,
+                            order: index + 1 // плюсуем 1 чтобы порядок начинался с 1, а не с нуля
+                        })
+                    })
+    
+                    $.ajax({
+                        type: 'POST',
+                        url: window.location.href,
+                        data: {
+                            csrfmiddlewaretoken: csrfToken,
+                            cell_order: JSON.stringify(order),
+                            sortable_obj_type: sortableObjType,
+                        },
+                        success: function () {},
+                    })
+                },
+            })
+        }
+    }
+
+    sortableContainer($lessons, forLesson, 'lesson')
+    sortableContainer($modules, forModule, 'module')
+})
+```
+У цьому файлі обробляється зміна порядку елементів на сторінці (наприклад модулів та уроків), та відправка нового порядку модулів та уроків на сервер для обробки та отримання потрібних змін для сторінки після цього
+
+#### Файл djangocourse_pr/course/static/js/elements_sortable.js
+```javascript
+$(document).ready(function() {
+    const taskData = $('#task-data') // Получаем блок где редактируется предложение, а также где находится его украинский перевод
+    let currentIndex = parseInt(taskData.data('current-index'), 10) // Получаем индекс предложения, на котором находится пользователь
+    
+    const initialSentence = $('#column1').text().split(" ") // Английская версия первого предложения
+    const buttons = $('.word-button') // Кнопки со словами для первого предложения
+    const finalSentence = $('.final-sentence') // Предложение собираемое пользователем
+    const progressBarCells = $('.progress-bar-cell') // Ячейки прогресс бара
+    const randomWordsFirstSentence = $('#randomwords_first') // Случайные слова для первого предложения
+    const changeFinalSentence = document.querySelector('.final-sentence') // Собираемое предложение
+    const finalSentencePlace = document.querySelector('.final-sentence-place') // Блок с подчеркиванием собираемого предложения
+    // Получаем кнопку удаления слов чтобы скрывать её
+    // в случае если слов нет, и наоборот
+    const undoBtn = document.querySelector('.undo-btn')
+
+    // Флаги
+    let formSubmittedFlag = false
+    let updateSentenceFlag = true
+    let undoSentenceFlag = true
+    let isFirstSentence = true
+    let isUpdateWords = true
+
+    // Подготавливаем рандомные слова для первого предложения, в виде массива
+    let randomWordsFirstSentenceText = randomWordsFirstSentence.text()
+    randomWordsFirstSentenceText = randomWordsFirstSentenceText.split(" ")
+
+    let allWords = []
+
+    // Функция отправки формы
+    // для перехода на следующие предложения
+    function submitForm() {
+        setTimeout(function() {
+            $('#nexttaskform').submit() // Отправка формы через 2 секунды (для красоты и плавности использования)
+        }, 2000);
+    }
+
+    // Функция в которой определяется какими словами обновлять кнопки
+    // в зависимости от предложения на котором находится пользователь
+    function checkSentenceForUpdateBtns() {
+        // Условие для обновления контента кнопок
+        // тут проверяется на каком предложении пользователь, в зависимости от этого обновляем контент кнопок на нужный
+        if (isFirstSentence && isUpdateWords) {
+            updateButtons(allWords)
+        } else if (allWords.length > 0 && isUpdateWords) {
+            updateButtons(allWords)
+        }
+    }
+
+    // Функция для перемешивания слов для кнопок
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]]
+        }
+        return array
+    }
+
+    // Функция обновления кнопок, после добавления/удаления слова
+    function updateButtons(wordsArray) {
+        wordsArray = shuffleArray(wordsArray)
+        wordsArray = wordsArray.toString().toLowerCase().split(',')
+        buttons.each(function(index) {
+            if (index < wordsArray.length) {
+                $(this).text(wordsArray[index])
+            }
+        })
+    }
+
+    // Универсальная функция подготовки слов для кнопок
+    // как для первого предложения, так и для всех последующих
+    function prepareButtonsContent(initialSentenceArg, randomFirstWords, randomWordsArg) {
+        allWords = initialSentenceArg.slice(0, 9)
+
+        if (allWords.length < 9) {
+            const neededWordsCountFS = 9 - allWords.length
+            if (randomFirstWords) {
+                randomWordsArg.splice(0, 1)
+            }
+            const additionalWordsFS = randomWordsArg.slice(0, neededWordsCountFS)
+            allWords = allWords.concat(additionalWordsFS)
+        }
+
+        allWords = shuffleArray(allWords)
+        allWords = allWords.toString().toLowerCase().split(',')
+
+        // Проверка и замена дублирующихся слов
+        for (let i = 0; i < allWords.length; i++) {
+            while (allWords.indexOf(allWords[i]) !== i) {
+                allWords[i] = randomWordsArg.shift() // Заменяем повторяющееся слова на новое
+            }
+        }
+
+        updateButtons(allWords)
+    }
+
+    // Добавляем слова первого предложения в кнопки
+    prepareButtonsContent(initialSentence, randomFirstWords=true, randomWordsFirstSentenceText)
+
+    // Функция обновления прогресс бара
+    function updateProgressBar() {
+        progressBarCells.each(function(index) {
+            if (index < currentIndex) {
+                $(this).addClass('correct')
+            }
+        })
+    }
+
+    // Обрабатываем клик на одну из кнопок со словами
+    $('.word-button').click(function() {
+        const buttonText = $(this).text()
+        const currentSentence = finalSentence.text()
+        // console.log(currentSentence)
+        if (currentSentence && updateSentenceFlag) {
+            finalSentence.text(`${currentSentence} ${buttonText}`) // Добавляем новое слово к старым, если они есть
+        } else if (!currentSentence && updateSentenceFlag) {
+            finalSentence.text(buttonText) // Просто задаем новое слово, ибо до него ничего нет
+        }
+
+        checkSentenceForUpdateBtns()
+    })
+
+    // Обрабатываем событие клика на кнопку удаления последнего слова
+    $('.undo-btn').click(function() {
+        // Получаем то что уже введено, и преобразуем в массив
+        if (undoSentenceFlag) {
+            const currentSentence = finalSentence.text()
+            const currentWordsOfSentence = currentSentence.split(" ")
+            currentWordsOfSentence.pop() // Удаляем последний элемент (последнее слово)
+            finalSentence.text(`${currentWordsOfSentence.join(' ')}`) // Преобразуем снова в текст, и задаем
+            
+            checkSentenceForUpdateBtns()
+        }
+    })
+
+    // Функция обработки неправильно собраного предложения
+    function incorrectSentence() {
+        changeFinalSentence.style.color = 'red'
+        finalSentencePlace.style.borderBottom = 'dashed 2px red'
+        progressBarCells.eq(currentIndex).addClass('incorrect') // Выделяем текущую ячейку прогресс-бара красным цветом
+        
+        formSubmittedFlag = true
+        updateSentenceFlag = false
+        undoSentenceFlag = false
+        isUpdateWords = false
+
+        submitForm()
+    }
+
+    // Функция проверки предложения
+    function checkSentenceByInterval() {
+        if (finalSentence.text() == '') {
+            undoBtn.style.display = 'none'
+            undoBtn.style.visibility = 'hidden'
+        } else {
+            undoBtn.style.display = 'flex'
+            undoBtn.style.visibility = 'visible'
+        }
+        
+        // Проверяем отправляется ли форма
+        // в ином случае проверка заданий будет работать не корректно, и задание будет проходится автоматически
+        if (formSubmittedFlag) return
+
+        const userSentence = finalSentence.text() // Получаем предложение, собранное пользователем
+        let correctSentence = $('#column1').text() // Правильное предложение
+        correctSentence = correctSentence.toLowerCase()
+        const userWords = userSentence.split(" ")
+        const correctWords = correctSentence.split(" ")
+        // console.log(userWords)
+        // console.log(correctWords)
+
+        // Дополнительно условие если каким-то образом пользователь ввёл слов больше чем нужно
+        if (userWords.length > correctWords.length) {
+            incorrectSentence()
+        } else if (userWords.length === correctWords.length)  {
+            if (userSentence === correctSentence) {
+                changeFinalSentence.style.color = 'orange'
+                finalSentencePlace.style.borderBottom = 'dashed 2px orange'
+
+                formSubmittedFlag = true
+                updateSentenceFlag = false
+                undoSentenceFlag = false
+                isUpdateWords = false
+
+                submitForm()
+            } else {
+                incorrectSentence()
+            }
+        } else {
+            // Если предложение ещё не собрано до конца
+            changeFinalSentence.style.color = 'black'
+            finalSentencePlace.style.borderBottom = 'dashed 2px rgb(28, 28, 28)'
+            progressBarCells.eq(currentIndex).removeClass('incorrect')
+        }
+    }
+
+    // Проверяем собираемое предложение каждый 50 миллисекунд
+    setInterval(checkSentenceByInterval, 50)
+    
+    $('#nexttaskform').submit(function(event) {
+        let isCorrect = changeFinalSentence.style.color === 'orange' ? 1 : 0;
+        // console.log(isCorrect)
+        event.preventDefault()
+
+        $.ajax({
+            url: window.location.href,
+            type: 'POST',
+            data: {
+                'current_index': currentIndex,
+                // 'is_correct': isCorrect,
+                'csrfmiddlewaretoken': $('input[name="csrfmiddlewaretoken"]').val(),
+            },
+            success: function(response) {
+                if (response.error) {
+                    window.location.href = allTasksUrl
+                } else {
+                    $('#column1').text(response.english_sentence)
+                    $('#column2').text(response.ukrainian_sentence)
+                    currentIndex = response.next_index
+                    taskData.data('current-index', currentIndex) // Обновляем предложение на странице после проверки на его правильность
+
+                    updateProgressBar()
+
+                    isFirstSentence = false
+                    
+                    // Получаем верное предложение я рандомные слова для последующих предложений
+                    let words = response.english_sentence.split(" ")
+                    let randomWords = response.additional_words
+
+                    // Добавляем слова новых предложений в кнопки
+                    prepareButtonsContent(words, randomFirstWords=false, randomWords)
+                    
+                    finalSentence.text('')
+                    formSubmittedFlag = false
+                    updateSentenceFlag = true
+                    undoSentenceFlag = true
+                    isUpdateWords = true
+                }
+            },
+        });
+    });
+});
+```
+Цей файл забезпечує зручне, швидке та просте функціонування завдання зі збору реченнь
+Тут обробляється:
+1. Підстановка наступного речення у завданні
+2. Заповнення блоків з словами потрібними слова для збору речення, та додаткових
+3. Зміна порядку слів після кожного доданого та видаленого слова
+4. Видалення останнього слова з речення яка збирає студент
+5. Обробка того, чи правильно виконано збір речення
+6. Оновлення прогресс бару
+Та багато інших дрібних моментів які забезпечують зручне виконання завдання студентом
+
 ### BACKEND
 #### Файл djangocourse_pr/utils.py
 ```python
