@@ -134,14 +134,14 @@ def main_view(request):
         
     return render(request, 'course/main.html', context)
 
-# Для страницы курса со всеми модулями, уроками и заданиями
+# Для сторінки курса з усіма модулями, уроками та завданнями
 def course_view(request):
     context = {}
     
     context['user_status'] = utils.check_status(request_user=UserProfile.objects.get(user=request.user))
     utils.check_user_authentication(request, context)
     
-    # _candelete добавлено в название чтобы отличить от другой переменной all_lessons
+    # _candelete додано до назви щоб відрізнити від іншой змінної all_lessons
     all_lessons_candelete = Lesson.objects.all()
     all_tasks = Task.objects.all().values_list('lesson_id', flat=True)
 
@@ -149,18 +149,18 @@ def course_view(request):
 
     for lesson in all_lessons_candelete:
         if lesson.id in lesson_ids_with_tasks:
-            # Если для урока есть задания, запрещаем удаление
+            # Якщо в уроці є завдання, забороняємо його видалення
             if lesson.can_delete:
                 lesson.can_delete = False
                 lesson.save()
         else:
-            # Если для урока нет заданий, разрешаем удаление
+            # Якщо в уроці немає завдань, дозволяємо його видалення
             if not lesson.can_delete:
                 lesson.can_delete = True
                 lesson.save()
         
     if request.method == 'POST':
-        # Если был выбран модуль
+        # Якщо був обраний модуль
         if 'filter_by_module' in request.POST:
             module_id = request.POST.get('module_id')
             lessons_with_tasks = []
@@ -173,15 +173,15 @@ def course_view(request):
                     'tasks': tasks,
                 })
 
-            # Получаем шаблон, в котором находятся уроки из выбранного модуля, для передачи его
-            # в ajax, а потом и на саму страницу
+            # Отримуємо шаблон, в якому знаходяться уроки з обраного модуля
+            # для відправлення в ajax, а потім на сторінку
             lessons_html = render_to_string('course/lessons_partial.html', {
                 'lessons_with_tasks': lessons_with_tasks,
                 'user_status': utils.check_status(request_user=UserProfile.objects.get(user=request.user)),
             }, request=request)
             
-            # Отображаем в меню выбора уроков для создания задания
-            # только те уроки, которые находятся в модуле выбранном пользователем
+            # Відображаємо в меню вибору уроків під час створення завдань
+            # тільки ті уроки, які є в обраному користувачем модулі
             dropdown_lessons_html = render_to_string('course/lesson_dropdown_for_tasks.html', {
                 'lessons_with_tasks': lessons_with_tasks,
             }, request=request)
@@ -191,8 +191,8 @@ def course_view(request):
                 'dropdown_lessons': dropdown_lessons_html,
             })
         
-        # Если происходит смена порядка элементов на странице с помощью библиотеки Sortable
-        # (уроки либо модули)
+        # Якщо проходить зміна порядку елементів на сторінці за допомогою бібліотеки Sortable
+        # (уроки або модулі)
         if 'cell_order' in request.POST:
             sortable_obj_type = request.POST['sortable_obj_type']
             
@@ -201,7 +201,7 @@ def course_view(request):
             if sortable_obj_type == 'module':
                 utils.cell_order(cell_model=Module, cell_order_from_request=request.POST['cell_order'])
                 
-        # Если от ajax-а пришло что пользователь добавляет задание
+        # Якщо користувач додає завдання
         if 'add_task' in request.POST:
             task_name = request.POST.get('taskname')
             task_file = request.FILES.get('taskfile')
@@ -217,10 +217,10 @@ def course_view(request):
                 additional_words_list = []
 
                 for row in sentences.itertuples(index=False):
-                    column1_value = row[0] # английское предложение
-                    column2_value = row[1] # украинское предложение
+                    column1_value = row[0] # Речення англійською
+                    column2_value = row[1] # Речення українською
                     
-                    # Подготавливаем предложения и списки с ними для загрузки в модель при создании урока
+                    # Підготовуємо речення та списки з ними для завантаження в базу даних під час створення уроку
                     cleaned_value_column1 = column1_value.strip()
                     lines_column1 = cleaned_value_column1.split('\n')
                     cleaned_value_column2 = column2_value.strip()
@@ -290,13 +290,14 @@ def course_view(request):
             else:
                 return JsonResponse({'error': 'Заповніть усі поля'})
         
+        # Якщо видаляється завдання
         if 'delete_task' in request.POST:
-            # Получаем из ajax id задания которое нужно удалить
+            # Отримуємо id завдання яке нам потрібно видалити
             task_id = request.POST.get('task_id')
             lesson_id = request.POST.get('lesson_id')
             
             try:
-                # Получаем его из бд и удаляем на стороне сервера
+                # Отримуємо його з бази даних та видаляємо на боці серверу
                 task = Task.objects.get(id=task_id)
                 task.delete()
                 
@@ -307,12 +308,13 @@ def course_view(request):
                     lesson.can_delete = True
                     lesson.save()
 
-                # Отправляем ajax-у, что можно удалять задание на стороне клиента
+                # Дозволяємо видалити завдання з шаблону
                 return JsonResponse({'deleteTask': True, 'canDeleteLesson': not remaining_tasks})
-            # На крайняк, если задания каким-то образом не будет
+            # Якщо якимось чином не буде завдання
             except Task.DoesNotExist:
                 return JsonResponse({'success': False, 'error': 'Завдання не знайдено'})
             
+        # Якщо додається урок
         if 'add_lesson' in request.POST:
             lesson_name = request.POST.get('lessonname')
             module_id = request.POST.get('module_id')
@@ -340,6 +342,7 @@ def course_view(request):
             else:
                 return JsonResponse({'error': 'Заповніть поле з назвою уроку'})
         
+        # Якщо видаляється урок
         if 'delete_lesson' in request.POST:
             lesson_id = request.POST.get('lesson_id')
             try:
@@ -349,6 +352,7 @@ def course_view(request):
             except Lesson.DoesNotExist:
                 return JsonResponse({'success': False, 'error': 'Урок не знайдений'})
         
+        # Якщо додається модуль
         if 'add_module' in request.POST:
             module_name = request.POST.get('modulename')
             course_id = request.POST.get('course_id')
@@ -371,6 +375,7 @@ def course_view(request):
                 })
             else:
                 return JsonResponse({'error': 'Заповніть поле з назвою модулю'})
+        # Якщо видаляється модуль
         if 'delete_module' in request.POST:
             module_id = request.POST.get('module_id')
             
@@ -402,7 +407,7 @@ def course_view(request):
     
     return render(request, 'course/course.html', context)
 
-# Для страницы каждого задания
+# Функція сторінки кожного завдання
 def task_detail_view(request, task_id):
     context = {}
     
@@ -415,10 +420,10 @@ def task_detail_view(request, task_id):
     additional_words = task.additional_words
     
     if request.method == 'POST':
-        # Получаем задание на котором находимся из ajax
+        # Отримуємо завдання на якому знаходимось з ajax
         current_index = int(request.POST.get('current_index', 0))
 
-        # Если не достигли конца списка предложений, передаем индекс следующего предложения
+        # Якщо не дойшли до кінця списку реченнь, передаємо індекс наступного речення
         if current_index < len(english_sentences) - 1:
             next_english_sentence = english_sentences[current_index + 1]
             next_ukrainian_sentence = ukrainian_sentences[current_index + 1]
@@ -434,14 +439,14 @@ def task_detail_view(request, task_id):
 
         return JsonResponse(response_data)
 
-    # Получаем первое предложение в задании
+    # Отримуємо перше речення в завданні
     first_english_sentence = english_sentences[0]
     first_ukrainian_sentence = ukrainian_sentences[0]
     context['task'] = task
-    context['first_english_sentence'] = first_english_sentence  # Передаем первое предложение на английском
-    context['first_ukrainian_sentence'] = first_ukrainian_sentence  # Передаем первое предложение на украинском
-    context['sentences_len'] = range(1, len(english_sentences) + 1)  # Передаем количество предложений
-    context['additional_words_first'] = additional_words  # Передаем дополнительные слова для первого предложения
+    context['first_english_sentence'] = first_english_sentence  # Передаємо перше речення англійською
+    context['first_ukrainian_sentence'] = first_ukrainian_sentence  # Передаємо перше речення українською
+    context['sentences_len'] = range(1, len(english_sentences) + 1)  # Передаємо кількість реченнь
+    context['additional_words_first'] = additional_words  # Передаємо додаткові слова для першого речення
     
     return render(request, 'course/task_detail.html', context)
 ```
@@ -474,14 +479,14 @@ from auth_reg.models import *
 import utils
 
 # Create your views here.
-# Функция обработки авторизации
+# Функція обробки авторизації
 def auth_view(request):
     context = {}
     
     utils.check_user_authentication(request, context)
     
     if 'submit_btn' in request.POST:
-        # Проверка, если пользователь уже вошел в аккаунт при попытке входа
+        # Перевірка чи вже увійшов користувач під час спроби увійти
         if request.user.is_authenticated:
             context['error'] = 'Вы уже вошли в аккаунт'
         else:
@@ -503,7 +508,7 @@ def auth_view(request):
         return redirect('auth')
     return render(request, 'auth_reg/auth.html', context)
 
-# Функция обработки регистрации
+# Функція яка обробляю реєстрацію
 def reg_view(request):
     context = {}
     
@@ -516,15 +521,15 @@ def reg_view(request):
     
         if username and password and confirm_password:
             if password == confirm_password:
-                # Проверка наличия такого пользователя
+                # Перевірка існування такого користувача
                 try:
-                    # Создание пользователя
+                    # Створення користувача
                     user = User.objects.create_user(
                         username=username,
                         password=password,
                     )
                     
-                    # Создание профиля пользователя
+                    # Створення профилю користувача
                     UserProfile.objects.create(user=user)
                     
                     return redirect('auth')
