@@ -101,6 +101,7 @@ python3 manage.py runserver
 - **[HTML](https://developer.mozilla.org/en-US/docs/Web/HTML)/[CSS](https://developer.mozilla.org/en-US/docs/Learn/CSS)** — мови для верстки сайту, створення його структури та стилів
 - **[Bootstrap 5](https://getbootstrap.com/)** — фронтенд-фреймворк для створення деяких елементів на сторінках
 - **[Figma](https://help.figma.com/hc/en-us)** — онлайн-сервіс, використаний для планування дизайну сайту
+- **[SQLite3](https://www.sqlite.org/docs.html)** - база даних, яка була використана для розробки сайту
 
 ## Структура проекту
 ```mermaid
@@ -375,6 +376,7 @@ def course_view(request):
                 })
             else:
                 return JsonResponse({'error': 'Заповніть поле з назвою модулю'})
+
         # Якщо видаляється модуль
         if 'delete_module' in request.POST:
             module_id = request.POST.get('module_id')
