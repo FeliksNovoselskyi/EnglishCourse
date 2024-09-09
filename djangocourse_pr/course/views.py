@@ -177,6 +177,7 @@ def course_view(request):
             else:
                 return JsonResponse({'error': 'Заповніть усі поля'})
         
+        # Если удаляется задание
         if 'delete_task' in request.POST:
             # Получаем из ajax id задания которое нужно удалить
             task_id = request.POST.get('task_id')
@@ -200,7 +201,8 @@ def course_view(request):
             # На крайняк, если задания каким-то образом не будет
             except Task.DoesNotExist:
                 return JsonResponse({'success': False, 'error': 'Завдання не знайдено'})
-            
+        
+        # Если добавляется урок
         if 'add_lesson' in request.POST:
             lesson_name = request.POST.get('lessonname')
             module_id = request.POST.get('module_id')
@@ -228,6 +230,7 @@ def course_view(request):
             else:
                 return JsonResponse({'error': 'Заповніть поле з назвою уроку'})
         
+        # Если удаляется урок
         if 'delete_lesson' in request.POST:
             lesson_id = request.POST.get('lesson_id')
             try:
@@ -237,6 +240,7 @@ def course_view(request):
             except Lesson.DoesNotExist:
                 return JsonResponse({'success': False, 'error': 'Урок не знайдений'})
         
+        # Если добавляется модуль
         if 'add_module' in request.POST:
             module_name = request.POST.get('modulename')
             course_id = request.POST.get('course_id')
@@ -259,6 +263,8 @@ def course_view(request):
                 })
             else:
                 return JsonResponse({'error': 'Заповніть поле з назвою модулю'})
+        
+        # Если удаляется модуль
         if 'delete_module' in request.POST:
             module_id = request.POST.get('module_id')
             
