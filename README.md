@@ -581,3 +581,66 @@ def reg_view(request):
 ```
 У цьому файлі проходить відображення сторінок авторизації та реєстрації
 Також тут виконується функціонал авторизації та реєстрації
+
+### МОДЕЛІ ПРОЕКТУ
+#### Додаток - course
+```python
+# Модель курса (базово - курс англійської мови)
+class Course(models.Model):
+    course_name = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+    
+# Модель модулю, в якому зберігаються уроки, ця модель зберігає назву модулю, та його порядок з іншими модулями
+class Module(models.Model):
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='modules')
+    module_name = models.CharField(max_length=255)
+    order = models.PositiveIntegerField(default=0)  
+
+# Модель уроку, в якій зберігається його назва, зв'язок з моделлю модуля
+# а також можливість його видаляти, та їх порядок
+class Lesson(models.Model):
+    module = models.ForeignKey(Module, on_delete=models.CASCADE, related_name='lessons')
+    lesson_name = models.CharField(max_length=255, blank=True, null=True)
+    can_delete = models.BooleanField(default=True)
+    order = models.PositiveIntegerField(default=0)
+
+# Модель завдання в якій зберігаються речення для завдання, та додаткові слова для нього, та інше
+class Task(models.Model):
+    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
+    task_name = models.CharField(max_length=10)
+    excel_file = models.FileField(upload_to='excel_files/', blank=True, null=True)
+    additional_words_file = models.FileField(upload_to='additional_words_files/', blank=True, null=True)
+    
+    english_sentences = models.JSONField(default=list)
+    ukrainian_sentences = models.JSONField(default=list)
+    additional_words = models.JSONField(default=list)
+    current_index = models.PositiveIntegerField(default=0)
+```
+
+#### Додаток - auth_reg
+```python
+# Модель користувацього профілю, в якій зберігається зв'язок з оригінальною моделлю User
+# та роль користувача на сайті: вчитель або студент
+class UserProfile(models.Model):
+    ROLE_CHOICES = (
+        ('student', 'Student'),
+        ('teacher', 'Teacher'),
+    )
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    role = models.CharField(max_length=7, choices=ROLE_CHOICES, default='student')
+```
+
+##### Діаграма зі структурою цих моделей
+###### course
+```mermaid
+graph TD;
+    A[Course] --> B[Module] --> C[Lesson] --> D[Task];
+```
+
+###### auth_reg
+```mermaid
+graph TD;
+    A[User] --> B[UserProfile];
+```
+
+## Плани подальшого розвитку проекту
