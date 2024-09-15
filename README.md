@@ -1,4 +1,5 @@
 # Доброго дня!
+---
 # Course Project - Проект курсу для навчання
 
 ![Python](https://img.shields.io/badge/python-3.12.5-blue)
@@ -11,6 +12,7 @@
 ![Bootstrap 5](https://img.shields.io/badge/Bootstrap-5.0-purple)
 ![Figma](https://img.shields.io/badge/Figma-design-blueviolet)
 ![Open Source](https://img.shields.io/badge/Open%20Source-%E2%9D%A4%EF%B8%8F-blue)
+![English Support](https://img.shields.io/badge/English%20Support-%F0%9F%87%AC%F0%9F%87%A7-blue)
 
 ## Опис проекту
 
@@ -29,6 +31,7 @@
 - [BACKEND](#backend)
 - [МОДЕЛІ ПРОЕКТУ](#моделі-проекту)
 - [Плани подальшого розвитку проекту](#плани-подальшого-розвитку-проекту)
+- [English version](#english-version)
 
 ## Встановлення та запуск
 ### Якщо Django встановлений
