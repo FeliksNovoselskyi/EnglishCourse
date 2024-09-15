@@ -1308,6 +1308,7 @@ graph TD;
 ![Bootstrap 5](https://img.shields.io/badge/Bootstrap-5.0-purple)
 ![Figma](https://img.shields.io/badge/Figma-design-blueviolet)
 ![Open Source](https://img.shields.io/badge/Open%20Source-%E2%9D%A4%EF%B8%8F-blue)
+![English Support](https://img.shields.io/badge/English%20Support-%F0%9F%87%AC%F0%9F%87%A7-blue)
 
 ## Project Description
 
@@ -2511,3 +2512,80 @@ def reg_view(request):
 ```
 This file displays the authorization and registration pages
 Also, the authorization and registration functionality is performed here
+
+### PROJECT MODELS
+>[Back to top](#hello)
+#### App - course
+```python
+# Course model (basically - English language course)
+class Course(models.Model):
+    course_name = models.CharField(max_length=255)
+    description = models.TextField(blank=True, null=True)
+    
+# Module model, which contains lessons. This model stores the module name and its order relative to other modules
+class Module(models.Model):
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='modules')
+    module_name = models.CharField(max_length=255)
+    order = models.PositiveIntegerField(default=0)  
+
+# Lesson model, which stores its name, relation to the module model,
+# as well as its deletability and order
+class Lesson(models.Model):
+    module = models.ForeignKey(Module, on_delete=models.CASCADE, related_name='lessons')
+    lesson_name = models.CharField(max_length=255, blank=True, null=True)
+    can_delete = models.BooleanField(default=True)
+    order = models.PositiveIntegerField(default=0)
+
+# Task model, which stores sentences for the task, additional words for it, and other details
+class Task(models.Model):
+    lesson = models.ForeignKey(Lesson, on_delete=models.CASCADE)
+    task_name = models.CharField(max_length=10)
+    excel_file = models.FileField(upload_to='excel_files/', blank=True, null=True)
+    additional_words_file = models.FileField(upload_to='additional_words_files/', blank=True, null=True)
+    
+    english_sentences = models.JSONField(default=list)
+    ukrainian_sentences = models.JSONField(default=list)
+    additional_words = models.JSONField(default=list)
+    current_index = models.PositiveIntegerField(default=0)
+```
+
+#### App - auth_reg
+```python
+# User profile model, which stores the relation to the original User model
+# and the user's role on the site: teacher or student
+class UserProfile(models.Model):
+    ROLE_CHOICES = (
+        ('student', 'Student'),
+        ('teacher', 'Teacher'),
+    )
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    role = models.CharField(max_length=7, choices=ROLE_CHOICES, default='student')
+```
+
+##### Diagram with the structure of these models
+###### course
+```mermaid
+graph TD;
+    A[Course] --> B[Module] --> C[Lesson] --> D[Task];
+```
+
+###### auth_reg
+```mermaid
+graph TD;
+    A[User] --> B[UserProfile];
+```
+
+## Future development plans
+1. Saving user progress
+2. Improved validation of authorization and registration with confirmation by email
+3. Add the ability to change the types of tasks during their creation
+4. Make a full-fledged website design, with its planning in Figma
+5. Add the ability to change the theme of the site, and automatically change the theme to match the theme of the user's computer or phone
+6. Full adaptation for tablets, phones, and other devices
+7. Maximize the readability of the project code
+
+## Want to go back to the beginning of the file?
+>[Back to top](#hello)
+
+# Дякуємо!
+# Thank you!
