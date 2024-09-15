@@ -1287,3 +1287,139 @@ graph TD;
 
 ## Хочете повернутись до початку файлу?
 >[Повернутись до початку](#доброго-дня)
+
+---
+# English version
+---
+
+## Hello!
+## Course Project - Course Project for Teaching
+
+![Python](https://img.shields.io/badge/python-3.12.5-blue)
+![Django](https://img.shields.io/badge/django-5.0-brightgreen)
+![jQuery](https://img.shields.io/badge/jQuery-3.6.0-blue)
+![Sortable.js](https://img.shields.io/badge/Sortable.js-1.14.0-orange)
+![AJAX](https://img.shields.io/badge/AJAX-technology-orange)
+![JavaScript](https://img.shields.io/badge/JavaScript-ES6-yellow)
+![HTML/CSS](https://img.shields.io/badge/HTML%2FCSS-blue)
+![Bootstrap 5](https://img.shields.io/badge/Bootstrap-5.0-purple)
+![Figma](https://img.shields.io/badge/Figma-design-blueviolet)
+![Open Source](https://img.shields.io/badge/Open%20Source-%E2%9D%A4%EF%B8%8F-blue)
+
+## Project Description
+
+This project is a course for teaching students and creating lessons and assignments for teachers. Teachers have a convenient interface for creating modules, lessons, and tasks for students, while students can quickly complete the tasks created.
+
+The main advantage of the project is the extensive use of AJAX technology, which allows nearly all operations—filling out, creating, deleting, and completing tasks—to be performed quickly and without page refreshes.
+
+## Table of Contents
+- [Installation and Running](#installation-and-running)
+- [Using Account Features](#using-account-features)
+- [Project Pages](#project-pages)
+- [Technologies Used](#technologies-used)
+- [Project Structure](#project-structure)
+- [Project Functionality](#project-functionality)
+- [FRONTEND](#frontend)
+- [BACKEND](#backend)
+- [PROJECT MODELS](#project-models)
+- [Future Development Plans](#future-development-plans)
+
+## Installation and Running
+### If Django is already installed
+#### 1. Clone the repository
+```
+git clone https://github.com/FeliksNovoselskyi/course-tasks-practice.git
+```
+#### 2. Navigate to the main project directory containing the ```manage.py``` file
+```
+cd djangocourse_pr
+```
+#### 3. Install necessary libraries for creating tasks
+```
+pip install pandas
+```
+```
+pip install openpyxl
+```
+#### 4. Start the local server
+For Windows
+```
+python manage.py runserver
+```
+For MacOS/Linux
+```
+python3 manage.py runserver
+```
+
+### If Django is NOT installed
+#### 1. Install Django
+```
+pip install django
+```
+
+#### 2. Clone the repository
+```
+git clone https://github.com/FeliksNovoselskyi/course-tasks-practice.git
+```
+#### 3. Navigate to the main project directory containing the ```manage.py``` file
+```
+cd djangocourse_pr
+```
+#### 4. Install necessary libraries for creating tasks
+```
+pip install pandas
+```
+```
+pip install openpyxl
+```
+#### 5. Start the local server
+For Windows
+```
+python manage.py runserver
+```
+For MacOS/Linux
+```
+python3 manage.py runserver
+```
+
+## Using Account Features 
+>[Back to top](#hello)
+#### To use teacher features
+1. Go to the login page
+2. Log in with the username ```testteacher``` and password ```123456```
+3. Go to the course page and start using it
+
+#### To use student features
+1. Go to the login page
+2. Then, go to the registration page
+3. Create an account, which will initially be a student account
+4. Log in to your account
+
+## Project Pages
+>[Back to top](#hello)
+- **Home Page** - the main page of the project with information about the platform (currently an empty page)
+- **Course Page** - a page that allows teachers to populate the course with modules, lessons, and tasks, and for students to complete them
+- **Login and Registration Pages** - on these pages, you can create your account on the site and log in to it
+
+## Technologies Used
+>[Back to top](#hello)
+- **[Python](https://www.python.org/)** — programming language used for creating the backend of the site
+- **[Django](https://docs.djangoproject.com/en/5.0/)** — web framework used to build the project
+- **[JavaScript](https://developer.mozilla.org/en-US/docs/Web/JavaScript)** — main programming language used to enhance the user interface
+- **[jQuery](https://jquery.com/)** — JavaScript library that simplifies development and interaction with the project
+- **[Sortable](https://jqueryui.com/sortable/)** — jQuery plugin for convenient sorting of lessons and modules, as well as changing their sequence
+- **[AJAX](https://api.jquery.com/category/ajax/)** — technology for fast and convenient data handling without page refreshes
+- **[HTML](https://developer.mozilla.org/en-US/docs/Web/HTML)/[CSS](https://developer.mozilla.org/en-US/docs/Learn/CSS)** — languages for website layout, structure, and styling
+- **[Bootstrap 5](https://getbootstrap.com/)** — frontend framework used to create some elements on the pages
+- **[Figma](https://help.figma.com/hc/en-us)** — online service used for planning the site's design
+- **[SQLite3](https://www.sqlite.org/docs.html)** - database used for the site development
+
+## Project Structure
+>[Back to top](#hello)
+```mermaid
+graph TD;
+    A[djangocourse_pr] --> B[course] --> C[Application for the 
+    home page and the course page];
+    A --> D[auth_reg] --> E[Application for 
+    registration pages];
+```
